@@ -1,0 +1,57 @@
+pipeline:
+  - name: load_data
+    class: components.loader.DataLoader
+    method: load
+    params:
+      path: "../data/diplomatic_revolution_wiki.txt"
+    input: {}
+    output: docs
+
+  - names: chunking
+    class: components.chunker.TextSplitter
+    method: split
+    params:
+      chunk_size: 50
+      chunk_overlap: 5
+    input:
+      docs: docs
+    output: split_docs
+
+  - names: embedding
+    class: components.embedder.DocEmbedder
+    method: embed
+    params:
+      model_name: "all-MiniLM-L6-v2"
+    input:
+      split_docs: split_docs
+    output: vectorstore
+
+  - names: retrieving
+    class: components.retriever.ChunkRetriever
+    method: retrieve
+    params:
+      retriever_search_type: "similarity"
+      retriever_search_kwargs: {"k":5}
+    input:
+      vectorstore: vectorstore
+    output: retriever
+
+  - names: chaining
+    class: components.chainer.ComponentChainer
+    method: chain
+    params:
+      ollama_model: "mistral"
+    input:
+      retriever: retriever
+    output: qa_chain
+
+  - names: run_chain
+    class: components.runner.ChainRunner
+    method: run
+    params:
+    input:
+      qa_chain: qa_chain
+      USER_QUERY: "../src/prompt.txt"
+    output: response
+
+
