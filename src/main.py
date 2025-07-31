@@ -37,4 +37,8 @@ class PipelineRunner:
 
 if __name__ == "__main__":
     runner = PipelineRunner("../configs/pipeline_config.yaml")
-    print(runner.run())
+    result = runner.run()
+    print("Answer: \n", result["result"])
+    print("n\Citations:")
+    for doc in result["source_documents"]:
+        print(f"-{doc.page_content.strip()}")
