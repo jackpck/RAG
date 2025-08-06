@@ -18,7 +18,8 @@ class ComponentChainer:
         with open(SYSTEM_PROMPT, "r", encoding="utf-8") as f:
             prompt = f.read()
 
-        rag_prompt = {"prompt": PromptTemplate.from_template(prompt)}
+        rag_prompt = {"prompt": PromptTemplate(input_variabls=["context", "question"],
+                                               template=prompt)}
         qa_chain = RetrievalQA.from_chain_type(llm=self.llm,
                                                retriever=retriever,
                                                chain_type_kwargs=rag_prompt,

@@ -20,10 +20,13 @@ class PipelineRunner:
             cls = getattr(module, class_name)
             instance = cls(**params) if params else cls()
 
-            args = {k: self.context[k] if k in self.context else v
-                    for k, v in inputs.items()}
-            method = getattr(instance, method_name)
-            result = method(**args) if args else method()
+            if method_name:
+                method = getattr(instance, method_name)
+                args = {k: self.context[k] if k in self.context else v
+                        for k, v in inputs.items()}
+                result = method(**args) if args else method()
+            else:
+                result = instance
 
             if isinstance(outputs, dict) and outputs:
                 output_key = list(outputs.values())[0]
@@ -41,4 +44,4 @@ if __name__ == "__main__":
     print("Answer: \n", result["result"])
     print("n\Citations:")
     for doc in result["source_documents"]:
-        print(f"-{doc.page_content.strip()}")
+        print(f"- Content: {doc.page_content.strip()}")

@@ -1,18 +1,19 @@
 pipeline:
   - name: load_data
     class: components.loader.DataLoader
-    method: load
+    method: load_from_wikipedia_api
     params:
-      path: "../data/diplomatic_revolution_wiki.txt"
-    input: {}
+      metadata: {"source": "battle of stalingrad"}
+    input:
+      title: "Battle of Stalingrad"
     output: docs
 
   - names: chunking
     class: components.chunker.TextSplitter
     method: split
     params:
-      chunk_size: 50
-      chunk_overlap: 5
+      chunk_size: 100
+      chunk_overlap: 10
     input:
       docs: docs
     output: split_docs
@@ -36,13 +37,26 @@ pipeline:
       vectorstore: vectorstore
     output: retriever
 
+  - names: reranking
+    class: components.retriever.RerankRetriever
+    method:
+    params:
+      base_retriever: retriever
+      top_k: 3
+    input:
+    output: reranked_retriever
+
   - names: chaining
     class: components.chainer.ComponentChainer
     method: chain
     params:
-      ollama_model: "mistral"
+      ollama_model: "llama3"
+      temperature: 0
+      top_k: 10
+      top_p: 0.9
     input:
-      retriever: retriever
+      retriever: reranked_retriever
+      SYSTEM_PROMPT: "../src/system_prompt.txt"
     output: qa_chain
 
   - names: run_chain
