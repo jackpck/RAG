@@ -3,11 +3,11 @@ from langchain_core.documents import Document
 from typing import List
 
 class Reranker:
-    def __init__(self, rerank_model: str,
+    def __init__(self, model: str,
                  temperature: float,
                  top_k: int,
                  top_p: float):
-        self.llm = ChatOllama(model=rerank_model,
+        self.llm = ChatOllama(model=model,
                               temperature=temperature,
                               top_k=top_k,
                               top_p=top_p)
@@ -27,6 +27,7 @@ class Reranker:
     def rerank(self, query: str,
                documents: List[Document],
              top_k: int) -> List[Document]:
+        ranked = []
         for doc in documents:
             try:
                 response = llm.invoke(self.prompt.format(query,

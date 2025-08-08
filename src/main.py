@@ -18,7 +18,12 @@ class PipelineRunner:
             module_name, class_name = cls_path.rsplit(".", 1)
             module = importlib.import_module(module_name)
             cls = getattr(module, class_name)
-            instance = cls(**params) if params else cls()
+            if params:
+                new_params = {k: self.context[k] if k in self.context else v
+                              for k, v in params.items()}
+                instance = cls(**new_params)
+            else:
+                instance = cls()
 
             if method_name:
                 method = getattr(instance, method_name)
@@ -26,7 +31,7 @@ class PipelineRunner:
                         for k, v in inputs.items()}
                 result = method(**args) if args else method()
             else:
-                result = instance
+                result = instance # if method is empty in yaml, output will be the instance itself
 
             if isinstance(outputs, dict) and outputs:
                 output_key = list(outputs.values())[0]
@@ -36,6 +41,8 @@ class PipelineRunner:
             else:
                 self.context[outputs] = result
 
+        print("SELF.CONTEXT")
+        print(self.context)
         return self.context['response']
 
 if __name__ == "__main__":

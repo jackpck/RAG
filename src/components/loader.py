@@ -23,7 +23,7 @@ class DataLoader:
         e.g. title = "Battle of Stalingrad"
         '''
         wiki_content = WikipediaContent(title)
-        wiki_text = wiki_content.get_content()[:1000]
+        wiki_text = wiki_content.get_content()[:50000]
         docs = [Document(page_content=wiki_text)]
         for doc in docs:
             doc.metadata["source"] = self.metadata["source"]

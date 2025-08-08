@@ -32,7 +32,7 @@ pipeline:
     method: retrieve
     params:
       retriever_search_type: "similarity"
-      retriever_search_kwargs: {"k":5}
+      retriever_search_kwargs: {"k":20}
     input:
       vectorstore: vectorstore
     output: retriever
@@ -41,8 +41,12 @@ pipeline:
     class: components.retriever.RerankRetriever
     method:
     params:
-      base_retriever: retriever
-      top_k: 3
+      retriever: retriever
+      k_rerank: 3
+      model_rerank: "llama3"
+      temperature_rerank: 0
+      top_k_rerank: 10
+      top_p_rerank: 0.9
     input:
     output: reranked_retriever
 
@@ -55,7 +59,7 @@ pipeline:
       top_k: 10
       top_p: 0.9
     input:
-      retriever: reranked_retriever
+      reranked_retriever: reranked_retriever
       SYSTEM_PROMPT: "../src/system_prompt.txt"
     output: qa_chain
 
