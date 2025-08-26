@@ -15,10 +15,14 @@ this is not sufficient in Windows. One need to set the environment variable in t
 system environment variables**
 
 
-### Dynamica chaining using yaml
+### Dynamical chaining using yaml
 
 ### get("params", {}) format error
 
 in yaml, if indentation is followed by -, using get("params", {})
 will create list of size-one dict instead of dict
+
+### no attribute "__pydantic_fields_set__" error
+Remember to set default when setting type setting variables in a class.
+
 

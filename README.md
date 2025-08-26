@@ -1,13 +1,28 @@
 # RAG
 
-## 1. Build simple RAG using Ollama
+## Introduction
 
-## 2. Modulize code using dynamic chaining
+Build a modulized RAG. Components are modulized and linked together
+via dynamic chaining. Modular component can be found under ``src/components``.
+The ``run()`` function in ``main.py`` chain all the components via the DAG
+specified by ``configs/pipeline_config.yaml``
 
-## 3. Add reranker, citation
 
-## 4. Add evaluation module
+For starter, FAISS is used for the vector database. This does not 
+support hybrid search (e.g. BM25 + cosine similarity). If hybrid search
+is needed, consider using weaviate.
 
-## 5. Add prompt template
+llama3 (7B) was used as the first LLM. Performance deteriorates as the size of the document
+increases. Recommend using gpt-oss (20B) to improve performance.
 
-## 6. Battle simulation
+A two-stage retrieval is used. A reranker is used to enhance retrieval precision.
+
+Citation was also added to provide source of the retrieved document.
+
+
+## Development history
+1. Build simple RAG using Ollama
+2. Modulize code using dynamic chaining
+3. Add reranker and citation
+4. Add evaluation module [TODO]
+5. Add prompt template [TODO]

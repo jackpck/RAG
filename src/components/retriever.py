@@ -22,7 +22,7 @@ class RerankRetriever(BaseRetriever):
     k_rerank: int = 3
     model_rerank: str = None
     temperature_rerank: float = 0
-    top_k_rerank: int = 10
+    top_k_rerank: int = 1
     top_p_rerank: float = 0.9
 
     def __init__(self, retriever: BaseRetriever,
@@ -47,6 +47,5 @@ class RerankRetriever(BaseRetriever):
                                  top_p=self.top_p_rerank).rerank(query,
                                                                  retrieved_docs,
                                                                  top_k=self.k_rerank)
-        print('# relevant doc: ',len(reranked_docs))
         return reranked_docs
 

@@ -41,8 +41,6 @@ class PipelineRunner:
             else:
                 self.context[outputs] = result
 
-        print("SELF.CONTEXT")
-        print(self.context)
         return self.context['response']
 
 if __name__ == "__main__":
