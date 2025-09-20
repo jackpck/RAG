@@ -63,7 +63,5 @@ if __name__ == "__main__":
     runner = PipelineRunner("./configs/pipeline_config.yaml")
     result = runner.run()
     print(f"User query: \n{user_query}")
-    print(f"Answer: \n{result['result']}")
-    print(f"Citations:")
-    for doc in result["source_documents"]:
-        print(f"- Content: {doc.page_content.strip()}")
+    print(f"Answer: \n{result.content}")
+    #print(f"Citations: \n{result['sources']}")

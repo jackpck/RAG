@@ -1,7 +1,8 @@
 from langchain.vectorstores.base import VectorStoreRetriever
 from langchain.chat_models import init_chat_model
-from langchain.chains import RetrievalQA
-from langchain.prompts import PromptTemplate
+from langchain_core.runnables.base import RunnableSerializable, RunnableLambda
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnablePassthrough
 
 class ComponentChainer:
     def __init__(self, model: str,
@@ -16,16 +17,19 @@ class ComponentChainer:
                                    top_p=top_p)
 
     def chain(self, reranked_retriever: VectorStoreRetriever,
-              SYSTEM_PROMPT: str) -> RetrievalQA:
+              SYSTEM_PROMPT: str) -> RunnableSerializable:
         with open(SYSTEM_PROMPT, "r", encoding="utf-8") as f:
             prompt = f.read()
 
-        rag_prompt = {"prompt": PromptTemplate(input_variabls=["context", "question"],
-                                               template=prompt)}
-        qa_chain = RetrievalQA.from_chain_type(llm=self.llm,
-                                               retriever=reranked_retriever,
-                                               chain_type_kwargs=rag_prompt,
-                                               chain_type='stuff',
-                                               return_source_documents=True)
-        return qa_chain
+        rag_prompt = ChatPromptTemplate.from_template(prompt)
+        rag_chain = (
+            {
+                "context": reranked_retriever,
+                "question": RunnablePassthrough(),
+            }
+            | rag_prompt | self.llm
+        )
+        # Can also replace context by chunker | embedder | retriever and do away with
+        # chaining manually in main.py
+        return rag_chain
 

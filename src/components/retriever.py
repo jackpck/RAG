@@ -4,7 +4,6 @@ from typing import List
 from src.utils.reranker import Reranker
 from langchain_core.documents import Document
 from langchain_core.retrievers import BaseRetriever
-from langsmith import traceable
 
 class ChunkRetriever:
     def __init__(self, retriever_search_type: str,
@@ -12,7 +11,6 @@ class ChunkRetriever:
         self.retriever_search_type = retriever_search_type
         self.retriever_search_kwargs = retriever_search_kwargs
 
-    @traceable
     def retrieve(self, vectorstore: FAISS) -> VectorStoreRetriever:
         retriever = vectorstore.as_retriever(search_type=self.retriever_search_type,
                                              search_kwargs=self.retriever_search_kwargs)
@@ -43,7 +41,6 @@ class RerankRetriever(BaseRetriever):
         self.top_k_rerank = top_k_rerank
         self.top_p_rerank = top_p_rerank
 
-    @traceable
     def get_relevant_documents(self, query: str) -> List[Document]:
         retrieved_docs = self.retriever.get_relevant_documents(query)
         reranked_docs = Reranker(model=self.model_rerank,

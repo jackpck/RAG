@@ -63,14 +63,14 @@ pipeline:
     input:
       reranked_retriever: reranked_retriever
       SYSTEM_PROMPT: "./src/system_prompts/system_prompt.txt"
-    output: qa_chain
+    output: rag_chain
 
   - names: run_chain
     class: src.components.runner.ChainRunner
     method: run
     params:
     input:
-      qa_chain: qa_chain
+      rag_chain: rag_chain
       USER_QUERY: "./src/user_query/user_query.txt"
     output: response
 
