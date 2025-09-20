@@ -1,6 +1,6 @@
 pipeline:
   - name: load_data
-    class: components.loader.DataLoader
+    class: src.components.loader.DataLoader
     method: load_from_wikipedia_api
     params:
       metadata: {"source": "battle of stalingrad"}
@@ -9,17 +9,17 @@ pipeline:
     output: docs
 
   - names: chunking
-    class: components.chunker.TextSplitter
+    class: src.components.chunker.TextSplitter
     method: split
     params:
-      chunk_size: 200
-      chunk_overlap: 10
+      chunk_size: 1000
+      chunk_overlap: 100
     input:
       docs: docs
     output: split_docs
 
   - names: embedding
-    class: components.embedder.DocEmbedder
+    class: src.components.embedder.DocEmbedder
     method: embed
     params:
       model_name: "all-MiniLM-L6-v2"
@@ -28,48 +28,50 @@ pipeline:
     output: vectorstore
 
   - names: retrieving
-    class: components.retriever.ChunkRetriever
+    class: src.components.retriever.ChunkRetriever
     method: retrieve
     params:
       retriever_search_type: "similarity"
-      retriever_search_kwargs: {"k":20}
+      retriever_search_kwargs: {"k":50}
     input:
       vectorstore: vectorstore
     output: retriever
 
   - names: reranking
-    class: components.retriever.RerankRetriever
+    class: src.components.retriever.RerankRetriever
     method:
     params:
       retriever: retriever
-      k_rerank: 5 # choose top k reranker score
-      model_rerank: "llama3"
+      k_rerank: 10 # choose top k reranker score
+      model_rerank: "gemini-2.5-flash"
+      model_rerank_provider: "google_genai"
       temperature_rerank: 0
-      top_k_rerank: 1 # top k token in generation of the rerank score
-      top_p_rerank: 0.9
+      top_k_rerank: 5 # top k token in generation of the rerank score
+      top_p_rerank: 0.8
     input:
     output: reranked_retriever
 
   - names: chaining
-    class: components.chainer.ComponentChainer
+    class: src.components.chainer.ComponentChainer
     method: chain
     params:
-      ollama_model: "llama3"
+      model: "gemini-2.5-flash"
+      model_provider: "google_genai"
       temperature: 0
       top_k: 10 # response generation
-      top_p: 0.9
+      top_p: 0.8
     input:
       reranked_retriever: reranked_retriever
-      SYSTEM_PROMPT: "../src/system_prompt.txt"
+      SYSTEM_PROMPT: "./src/system_prompts/system_prompt.txt"
     output: qa_chain
 
   - names: run_chain
-    class: components.runner.ChainRunner
+    class: src.components.runner.ChainRunner
     method: run
     params:
     input:
       qa_chain: qa_chain
-      USER_QUERY: "../src/data/prompt.txt"
+      USER_QUERY: "./src/user_query/user_query.txt"
     output: response
 
 

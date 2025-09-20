@@ -1,17 +1,19 @@
 from langchain.vectorstores.base import VectorStoreRetriever
-from langchain.chat_models import ChatOllama
+from langchain.chat_models import init_chat_model
 from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
 
 class ComponentChainer:
-    def __init__(self, ollama_model: str,
-                        temperature: float,
-                        top_k: int,
-                        top_p: float):
-        self.llm = ChatOllama(model=ollama_model,
-                              temperature=temperature,
-                              top_k=top_k,
-                              top_p=top_p)
+    def __init__(self, model: str,
+                 model_provider: str,
+                 temperature: float,
+                 top_k: int,
+                 top_p: float):
+        self.llm = init_chat_model(model=model,
+                                   model_provider=model_provider,
+                                   temperature=temperature,
+                                   top_k=top_k,
+                                   top_p=top_p)
 
     def chain(self, reranked_retriever: VectorStoreRetriever,
               SYSTEM_PROMPT: str) -> RetrievalQA:

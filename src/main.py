@@ -1,6 +1,19 @@
 import yaml
 import importlib
+import os
+from langsmith import Client
 
+os.environ["GOOGLE_API_KEY"] = os.environ["GOOGLE_API_KEY"].rstrip()
+os.environ["LANGSMITH_API_KEY"] = os.environ["LANGSMITH_API_KEY"].rstrip()
+os.environ["LANGSMITH_WORKSPACE_ID"] = os.environ["LANGSMITH_WORKSPACE_ID"].rstrip()
+os.environ["LANGSMITH_ENDPOINT"] = os.environ["LANGSMITH_ENDPOINT"].rstrip()
+os.environ["LANGSMITH_PROJECT"] = os.environ["LANGSMITH_PROJECT"].rstrip()
+os.environ["LANGSMITH_TRACING"] = os.environ["LANGSMITH_TRACING"].rstrip()
+os.environ["LANGCHAIN_CALLBACKS_BACKGROUND"] = os.environ["LANGCHAIN_CALLBACKS_BACKGROUND"].rstrip()
+
+client = Client()
+
+RAG_metadata = {}
 class PipelineRunner:
     def __init__(self, config_path):
         with open(config_path, "r") as f:
@@ -44,9 +57,13 @@ class PipelineRunner:
         return self.context['response']
 
 if __name__ == "__main__":
-    runner = PipelineRunner("../configs/pipeline_config.yaml")
+    USER_QUERY_PATH = "./src/user_query/user_query.txt"
+    with open(USER_QUERY_PATH, "r", encoding="utf-8") as f:
+        user_query = f.read()
+    runner = PipelineRunner("./configs/pipeline_config.yaml")
     result = runner.run()
-    print("Answer: \n", result["result"])
-    print("n\Citations:")
+    print(f"User query: \n{user_query}")
+    print(f"Answer: \n{result['result']}")
+    print(f"Citations:")
     for doc in result["source_documents"]:
         print(f"- Content: {doc.page_content.strip()}")

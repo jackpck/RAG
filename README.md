@@ -26,3 +26,11 @@ Citation was also added to provide source of the retrieved document.
 3. Add reranker and citation
 4. Add evaluation module [TODO]
 5. Add prompt template [TODO]
+
+## Tracing using Langsmith
+- since not all components used are from langchain (e.g. FAISS vectorstore), the tracable decorate is 
+  needed to trace those components
+- Langsmith is not showing a chain of flow of the RAG due to the dynamic chaining structure is separating
+  components from each other. Use native langchain class to chain together components to enhance tracing.
+  Recommend using LCEL, which provides seamless tracing with langsmith (https://python.langchain.com/docs/concepts/lcel/:w
+  )
