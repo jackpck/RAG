@@ -29,7 +29,7 @@ class ComponentChainer:
             }
             | rag_prompt | self.llm
         )
-        # Can also replace context by chunker | embedder | retriever and do away with
-        # chaining manually in main.py
+        # TODO: replace context by chunker | embedder | retriever and do away with
+        # TODO: chaining manually in main.py
         return rag_chain
 

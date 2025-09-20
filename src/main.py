@@ -20,8 +20,13 @@ class PipelineRunner:
             self.config = yaml.safe_load(f)
         self.context = {}
 
-    def run (self):
-        for step in self.config["pipeline"]:
+    def run (self, from_vs):
+        if from_vs:
+            step_retrieving = [x["name"] for x in self.config["pipeline"]].index("embedding")
+            pipeline_steps = self.config["pipeline"][step_retrieving:]
+        else:
+            pipeline_steps = self.config["pipeline"]
+        for step in pipeline_steps:
             cls_path = step["class"]
             method_name = step["method"]
             params = step.get("params", {})
@@ -58,10 +63,11 @@ class PipelineRunner:
 
 if __name__ == "__main__":
     USER_QUERY_PATH = "./src/user_query/user_query.txt"
+    from_vs = True
     with open(USER_QUERY_PATH, "r", encoding="utf-8") as f:
         user_query = f.read()
     runner = PipelineRunner("./configs/pipeline_config.yaml")
-    result = runner.run()
+    result = runner.run(from_vs=from_vs)
     print(f"User query: \n{user_query}")
     print(f"Answer: \n{result.content}")
     #print(f"Citations: \n{result['sources']}")
