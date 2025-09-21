@@ -8,7 +8,6 @@ class ChainRunner:
             USER_QUERY: str) -> str:
         with open(USER_QUERY, "r", encoding="utf-8") as f:
             query = f.read()
-
         response = rag_chain.invoke(query)
 
         return response

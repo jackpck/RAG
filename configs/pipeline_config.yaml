@@ -8,7 +8,7 @@ pipeline:
       title: "Battle of Stalingrad"
     output: docs
 
-  - names: chunking
+  - name: chunking
     class: src.components.chunker.TextSplitter
     method: split
     params:
@@ -18,16 +18,17 @@ pipeline:
       docs: docs
     output: split_docs
 
-  - names: embedding
+  - name: embedding
     class: src.components.embedder.DocEmbedder
-    method: embed
+    method: from_vs # embed
     params:
       model_name: "all-MiniLM-L6-v2"
     input:
-      split_docs: split_docs
+      # split_docs: split_docs
+      vs_name: "faiss_index"
     output: vectorstore
 
-  - names: retrieving
+  - name: retrieving
     class: src.components.retriever.ChunkRetriever
     method: retrieve
     params:
@@ -37,11 +38,10 @@ pipeline:
       vectorstore: vectorstore
     output: retriever
 
-  - names: reranking
-    class: src.components.retriever.RerankRetriever
-    method:
+  - name: reranking
+    class: src.components.reranker.Reranker
+    method: rerank
     params:
-      retriever: retriever
       k_rerank: 10 # choose top k reranker score
       model_rerank: "gemini-2.5-flash"
       model_rerank_provider: "google_genai"
@@ -49,9 +49,11 @@ pipeline:
       top_k_rerank: 5 # top k token in generation of the rerank score
       top_p_rerank: 0.8
     input:
+      retriever: retriever
+      query:
     output: reranked_retriever
 
-  - names: chaining
+  - name: chaining
     class: src.components.chainer.ComponentChainer
     method: chain
     params:
@@ -65,7 +67,7 @@ pipeline:
       SYSTEM_PROMPT: "./src/system_prompts/system_prompt.txt"
     output: rag_chain
 
-  - names: run_chain
+  - name: run_chain
     class: src.components.runner.ChainRunner
     method: run
     params:

@@ -1,0 +1,12 @@
+Rate the relevance of the following document to the query on a scale
+of 1 (irrelevant) to 10 (highly relevant).
+
+Query: '{1}'
+
+Document:
+\"\"\"
+{2}
+\"\"\"
+
+Respond with only the number.
+
