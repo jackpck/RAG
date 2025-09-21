@@ -20,12 +20,13 @@ pipeline:
 
   - name: embedding
     class: src.components.embedder.DocEmbedder
-    method: from_vs # embed
+    method: embed
     params:
       model_name: "all-MiniLM-L6-v2"
-    input:
-      # split_docs: split_docs
       vs_name: "faiss_index"
+    input:
+      split_docs: split_docs
+      persist_vs: False
     output: vectorstore
 
   - name: retrieving
@@ -48,32 +49,22 @@ pipeline:
       temperature_rerank: 0
       top_k_rerank: 5 # top k token in generation of the rerank score
       top_p_rerank: 0.8
+      reranker_prompt_path: "./src/prompts/reranker_prompt.txt"
     input:
       retriever: retriever
       query:
     output: reranked_retriever
 
-  - name: chaining
-    class: src.components.chainer.ComponentChainer
-    method: chain
+  - name: generating
+    class: src.components.generator.GeneratorLLM
+    method: llm
     params:
       model: "gemini-2.5-flash"
       model_provider: "google_genai"
       temperature: 0
-      top_k: 10 # response generation
-      top_p: 0.8
+      top_k: 5 # top k token in generation of the rerank score
+      top_p: 0.9
+      system_prompt_path: "./src/prompts/system_prompt.txt"
     input:
-      reranked_retriever: reranked_retriever
-      SYSTEM_PROMPT: "./src/system_prompts/system_prompt.txt"
-    output: rag_chain
-
-  - name: run_chain
-    class: src.components.runner.ChainRunner
-    method: run
-    params:
-    input:
-      rag_chain: rag_chain
-      USER_QUERY: "./src/user_query/user_query.txt"
-    output: response
-
+    output:
 
