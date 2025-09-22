@@ -1,0 +1,17 @@
+{
+  "SYSTEM_PROMPT": {
+    "description": "SYSTEM_PROMPT",
+    "prompt_identifier": "system-system-prompt",
+    "tag_list": ["dev","v1","rag"]
+  },
+  "RERANKER_PROMPT": {
+    "description": "RERANKER_PROMPT",
+    "prompt_identifier": "system-reranker-prompt",
+    "tag_list": ["dev","v1","rag"]
+  },
+  "LLMJUDGE_PROMPT": {
+    "description": "LLMJUDGE_PROMPT",
+    "prompt_identifier": "system-llmjudge-prompt",
+    "tag_list": ["dev","v1","rag"]
+  }
+}
