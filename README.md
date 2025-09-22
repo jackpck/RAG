@@ -35,4 +35,9 @@ build the LCEL chain based on the config yaml file.
 All LLM are initialized by the `init_chat_model` method from langchain. Inference is made via making API call
 to the selected model (gemini-2.5-flash for MVP1)
 
+## MVP2
+
+- Add abstention
+- Add metadata to document
+
 

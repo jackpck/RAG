@@ -8,9 +8,7 @@ class ChainRunner:
     def _load_chain(self, config_path: str) -> RunnableSerializable:
         self.rag_chain = chain_from_yaml(config_path)
 
-    def run(self, USER_QUERY_PATH: str) -> str:
-        with open(USER_QUERY_PATH, "r", encoding="utf-8") as f:
-            user_query = f.read()
+    def run(self, user_query: str) -> str:
         response = self.rag_chain.invoke(user_query)
 
         return response

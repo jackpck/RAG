@@ -1,11 +1,11 @@
 Rate the relevance of the following document to the query on a scale
 of 1 (irrelevant) to 10 (highly relevant).
 
-Query: '{1}'
+Query: '{0}'
 
 Document:
 \"\"\"
-{2}
+{1}
 \"\"\"
 
 Respond with only the number.
