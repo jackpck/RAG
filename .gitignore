@@ -6,4 +6,5 @@ credentials
 __pycache__
 *.pyc
 *.pyo
+DEV_LOG.md
 

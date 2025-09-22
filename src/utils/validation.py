@@ -1,14 +1,16 @@
-from langchain.chat_models import ChatOllama
+from langchain.chat_models import init_chat_model
 
-class CheckAnswer:
-    def __init__(self, model_checker: str,
-                 temperature_checker: float,
-                 top_k_checker: int,
-                 top_p_checker: float):
-        self.llm = ChatOllama(model=model_checker,
-                              temperature=temperature_checker,
-                              top_k=top_k_checker,
-                              top_p=top_p_checker)
+class LLMJudge:
+    def __init__(self, model: str,
+                 model_provider: str,
+                 temperature: float,
+                 top_k: int,
+                 top_p: float):
+        self.llm_judge = init_chat_model(model=model,
+                                   model_provider=model_provider,
+                                   temperature=temperature,
+                                   top_k=top_k,
+                                   top_p=top_p)
         self.prompt = f"""
         Determine if the following response contains the true answer with 0 (not 
         contain) and 1 (contain).
@@ -26,20 +28,15 @@ class CheckAnswer:
         Respond with only the number.
         """
 
-    def check_response_answer(self, QUERY_ANSWER: str,
-                              rag_response: str) -> int:
-        with open(QUERY_ANSWER, "r", encoding="utf-8") as f:
-            answer_prompt = f.read()
-
+    def accuracy_metric(self, gold_answer: str,
+                        rag_response: str) -> bool:
         try:
-            print('run llm')
-            response = llm.invoke(self.prompt.format(answer_prompt,
-                                                     rag_response)).strip()
+            response = self.llm_judge.invoke(self.prompt.format(gold_answer,
+                                                                rag_response)).strip()
             score = int(response)
         except:
-            print('except')
             score = 0
 
-        return score
+        return bool(score)
 
 

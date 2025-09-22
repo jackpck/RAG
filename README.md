@@ -2,35 +2,37 @@
 
 ## Introduction
 
-Build a modulized RAG. Components are modulized and linked together
-via dynamic chaining. Modular component can be found under ``src/components``.
-The ``run()`` function in ``main.py`` chain all the components via the DAG
-specified by ``configs/pipeline_config.yaml``
+In this repo, I have developed a modulized RAG chatbot. In MVP1, user can ask questions about a topic from the
+Wikipedia page. In future MVPs, the plan is to develop a chatbot that reference difference sources. This can 
+easily be done due to the highly modulized structure of the code.
+
+**Highlight**: 
+
+the structure of the repo allows for easy customized experimentation, including addition of new components,
+  parameter tuning, prompt engineering etc. Using the langchain tech stack provides a seamless connection to the
+  langsmith UI for tracing and evaluation capabilities.
+
+## Tech stack
+- **Langchain**, specifically **LCEL** (LangChain Expression Language) as the main development framework.
+  Modularity is further enhanced using **dynamic chaining**
+- **Langsmith** for prompt versioning, tracing, evaluation and experimentation
+
+## Instructions
+In MVP1, there are the following components for the RAG under `src/components`
+- `loader.py`: make API call to Wikipedia and fetch the article of the given topic. Can expand capability to fetch 
+  other document sources
+- `chunker.py`: recursively chunk the document. Can expand to other more sophisticated chunking techniques
+- `embedder.py`: embedding chunks into the FAISS vector store. Can expand to other vector store such as *weaviate*
+  that support hybrid search (cosine similarity + BM25)
+- `retriever.py`: retrieve top chunks given the user query
+- `reranker.py`: rerank retrieved chunks by their relevancy to the user query using a LLM
+- `generator.py`: generate the final answer based on the reranked, retrieved chunks and the user query
+ 
+All components are highly modulized. User specifies the parameters of each component and how they link together
+in `configs/pipeline_config.yaml`. The `src/components/runner.py` script call the `chain_from_yaml` method to
+build the LCEL chain based on the config yaml file.
+
+All LLM are initialized by the `init_chat_model` method from langchain. Inference is made via making API call
+to the selected model (gemini-2.5-flash for MVP1)
 
 
-For starter, FAISS is used for the vector database. This does not 
-support hybrid search (e.g. BM25 + cosine similarity). If hybrid search
-is needed, consider using weaviate.
-
-llama3 (7B) was used as the first LLM. Performance deteriorates as the size of the document
-increases. Recommend using gpt-oss (20B) to improve performance.
-
-A two-stage retrieval is used. A reranker is used to enhance retrieval precision.
-
-Citation was also added to provide source of the retrieved document.
-
-
-## Development history
-1. Build simple RAG using Ollama
-2. Modulize code using dynamic chaining
-3. Add reranker and citation
-4. Add evaluation module [TODO]
-5. Add prompt template [TODO]
-
-## Tracing using Langsmith
-- since not all components used are from langchain (e.g. FAISS vectorstore), the tracable decorate is 
-  needed to trace those components
-- Langsmith is not showing a chain of flow of the RAG due to the dynamic chaining structure is separating
-  components from each other. Use native langchain class to chain together components to enhance tracing.
-  Recommend using LCEL, which provides seamless tracing with langsmith (https://python.langchain.com/docs/concepts/lcel/:w
-  )
