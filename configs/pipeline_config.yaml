@@ -34,7 +34,7 @@ pipeline:
     method: retrieve
     params:
       retriever_search_type: "similarity"
-      retriever_search_kwargs: {"k":50}
+      retriever_search_kwargs: {"k":20}
     input:
       vectorstore: vectorstore
     output: retriever
@@ -43,13 +43,14 @@ pipeline:
     class: src.components.reranker.Reranker
     method: rerank
     params:
-      k_rerank: 10 # choose top k reranker score
+      k_rerank: 5 # choose top k reranker score
       model_rerank: "gemini-2.5-flash"
       model_rerank_provider: "google_genai"
       temperature_rerank: 0
       top_k_rerank: 5 # top k token in generation of the rerank score
       top_p_rerank: 0.8
-      reranker_prompt_path: "./src/prompts/reranker_prompt.txt"
+      prompt_name: "system-reranker-prompt"
+      prompt_version: "latest"
     input:
       retriever: retriever
       query:
@@ -64,7 +65,8 @@ pipeline:
       temperature: 0
       top_k: 5 # top k token in generation of the rerank score
       top_p: 0.9
-      system_prompt_path: "./src/prompts/system_prompt.txt"
+      prompt_name: "system-system-prompt"
+      prompt_version: "latest"
     input:
     output:
 

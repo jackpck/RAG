@@ -15,7 +15,10 @@ if __name__ == "__main__":
     USER_QUERY_PATH = "./src/user_query/user_query.txt"
     CONFIG_PATH = "./configs/pipeline_config.yaml"
 
+    with open(USER_QUERY_PATH, "r", encoding="utf-8") as f:
+        user_query = f.read()
+
     RAG_chain = ChainRunner(config_path=CONFIG_PATH)
-    response = RAG_chain.run(USER_QUERY_PATH)
+    response = RAG_chain.run(user_query)
     print(f"response:\n{response.content}")
 

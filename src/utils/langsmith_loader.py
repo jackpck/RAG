@@ -1,28 +1,50 @@
 from langsmith import Client
 from langchain_core.prompts import ChatPromptTemplate
+from langsmith.schemas import Dataset
+from langsmith.utils import LangSmithError
+import os
+import json
 
-def load_prompt(client: Client) -> dict[ChatPromptTemplate]:
-    prompt_list = client.list_prompts(is_public=False)
-    prompt_dict = {}
-    for p in prompt_list.repos:
-        prompt_name = f"{p.repo_handle}:{p.last_commit_hash[:8]}"
-        prompt_dict[p.description] = client.pull_prompt(prompt_name)
+os.environ["LANGSMITH_API_KEY"] = os.environ["LANGSMITH_API_KEY"].rstrip()
+os.environ["LANGSMITH_WORKSPACE_ID"] = os.environ["LANGSMITH_WORKSPACE_ID"].rstrip()
+os.environ["LANGSMITH_ENDPOINT"] = os.environ["LANGSMITH_ENDPOINT"].rstrip()
+os.environ["LANGSMITH_PROJECT"] = os.environ["LANGSMITH_PROJECT"].rstrip()
+os.environ["LANGSMITH_TRACING"] = os.environ["LANGSMITH_TRACING"].rstrip()
+os.environ["LANGCHAIN_CALLBACKS_BACKGROUND"] = os.environ["LANGCHAIN_CALLBACKS_BACKGROUND"].rstrip()
 
-    return prompt_dict
+def load_prompt(prompt_name: str,
+                prompt_version: str = "latest") -> ChatPromptTemplate:
+    client = Client()
+    prompt = client.pull_prompt(f"{prompt_name}:{prompt_version}")
 
-def load_data(client: Client,
-              data_name: str,
-              examples: dict = None):
+    return prompt
+
+def load_data(data_name: str,
+              examples: dict = None) -> Dataset:
+    client = Client()
     try:
-        dataset = client.read_data(dataset_name=data_name)
+        dataset = client.read_dataset(dataset_name=data_name)
     except LangSmithError:
         dataset = client.create_dataset(dataset_name=data_name)
         client.create_examples(
             dataset_id=dataset.id,
             examples=examples
         )
-        dataset = client.read_data(dataset_name=data_name)
+        dataset = client.read_dataset(dataset_name=data_name)
 
     return dataset
 
+if __name__ == "__main__":
+
+    EVAL_DATA_PATH = "./data/evaluation/eval_examples.json"
+    data_name = "rag_test"
+
+    with open(EVAL_DATA_PATH, "r", encoding="utf-8") as f:
+        data = f.read()
+    examples = json.loads(data)["examples"]
+
+    dataset = load_data(data_name=data_name,
+                        examples=examples)
+
+    print(dataset)
 
