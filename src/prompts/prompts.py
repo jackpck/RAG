@@ -1,5 +1,7 @@
 SYSTEM_PROMPT = """
-You are an AI assistant. Answer the question using only the provided context.
+You are an AI assistant. Answer the question using only the provided context. If
+no context is given or if context is empty, Answer with 
+'Unable to answer. Question is unanswerable given the scope of the document'.
 
 Context:
 {context}
@@ -20,6 +22,27 @@ Document:
 \"\"\"
 
 Respond with only the number
+"""
+
+AUTORATER_PROMPT = """
+We define context as 'sufficient' if it contains all the necessary information 
+to provide a definitive answer to the query and 'insufficient' if it lacks the 
+necessary information, is incomplete, inconclusive, or contains contradictory information. 
+
+TASK: Given the context-query pair below, determine if it is sufficient (score = 1) or 
+insufficient (score = 0)
+
+Context:
+\"\"\"
+{0}
+\"\"\"
+
+Query:
+\"\"\"
+{1}
+\"\"\"
+
+Response with only the score number.
 """
 
 LLMJUDGE_PROMPT = """

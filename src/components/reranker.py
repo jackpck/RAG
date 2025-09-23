@@ -26,11 +26,11 @@ class Reranker:
                  prompt_name: str,
                  prompt_version: str):
         self.k_rerank = k_rerank
-        self.model_rerank = model_rerank
-        self.model_rerank_provider = model_rerank_provider
-        self.temperature_rerank = temperature_rerank
-        self.top_k_rerank = top_k_rerank
-        self.top_p_rerank = top_p_rerank
+        self.rerank_llm = init_chat_model(model=model_rerank,
+                                          model_provider=model_rerank_provider,
+                                          temperature=temperature_rerank,
+                                          top_k=top_k_rerank,
+                                          top_p=top_p_rerank)
         self._setup_prompt(prompt_name, prompt_version)
 
     def _setup_prompt(self, prompt_name, prompt_version):
@@ -40,16 +40,11 @@ class Reranker:
     def rerank(self, retriever: VectorStoreRetriever,
                query: str) -> List[Document]:
         retrieved_docs = retriever.invoke(query)
-        rerank_llm = init_chat_model(model=self.model_rerank,
-                                   model_provider=self.model_rerank_provider,
-                                   temperature=self.temperature_rerank,
-                                   top_k=self.top_k_rerank,
-                                   top_p=self.top_p_rerank)
 
         ranked = []
         for doc in retrieved_docs:
             try:
-                response = rerank_llm.invoke(self.reranker_prompt.format(query,
+                response = self.rerank_llm.invoke(self.reranker_prompt.format(query,
                                                                     doc.page_content)).content
                 score = int(response)
             except:

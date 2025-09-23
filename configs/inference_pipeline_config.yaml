@@ -1,32 +1,11 @@
 pipeline:
-  - name: load_data
-    class: src.components.loader.DataLoader
-    method: load_from_wikipedia_api
-    params:
-      metadata: {"source": "battle of stalingrad"}
-    input:
-      title: "Battle of Stalingrad"
-    output: docs
-
-  - name: chunking
-    class: src.components.chunker.TextSplitter
-    method: split
-    params:
-      chunk_size: 1000
-      chunk_overlap: 100
-    input:
-      docs: docs
-    output: split_docs
-
   - name: embedding
     class: src.components.embedder.DocEmbedder
-    method: embed
+    method: from_vs
     params:
       model_name: "all-MiniLM-L6-v2"
       vs_name: "faiss_index"
     input:
-      split_docs: split_docs
-      persist_vs: False
     output: vectorstore
 
   - name: retrieving
@@ -54,23 +33,7 @@ pipeline:
     input:
       retriever: retriever
       query:
-    output: reranked_document
-
-  - name: autorating
-    class: src.components.autorater.Autorater
-    method: autorate
-    params:
-      model_autorate: "gemini-2.5-flash"
-      model_autorate_provider: "google_genai"
-      temperature_autorate: 0
-      top_k_autorate: 5
-      top_p_autorate: 0.8
-      prompt_name: "system-autorater-prompt"
-      prompt_version: "latest"
-    input:
-      reranked_document: reranked_document
-      query:
-    output: autorated_document
+    output: reranked_retriever
 
   - name: generating
     class: src.components.generator.GeneratorLLM
