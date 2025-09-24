@@ -4,7 +4,7 @@ pipeline:
     method: from_vs
     params:
       model_name: "all-MiniLM-L6-v2"
-      vs_name: "faiss_index"
+      vs_name: "faiss_index_battle_of_stalingrad"
     input:
     output: vectorstore
 
@@ -33,7 +33,23 @@ pipeline:
     input:
       retriever: retriever
       query:
-    output: reranked_retriever
+    output: reranked_document
+
+  - name: autorating
+    class: src.components.autorater.Autorater
+    method: autorate
+    params:
+      model_autorate: "gemini-2.5-flash"
+      model_autorate_provider: "google_genai"
+      temperature_autorate: 0
+      top_k_autorate: 5
+      top_p_autorate: 0.8
+      prompt_name: "system-autorater-prompt"
+      prompt_version: "latest"
+    input:
+      reranked_document: reranked_document
+      query:
+    output: autorated_document
 
   - name: generating
     class: src.components.generator.GeneratorLLM

@@ -13,12 +13,19 @@ if __name__ == "__main__":
 
     client = Client()
     USER_QUERY_PATH = "./src/user_query/user_query.txt"
-    CONFIG_PATH = "./configs/pipeline_config.yaml"
+    # CONFIG_PATH = "./configs/pipeline_config.yaml" # use this for experimentation
+    CONFIG_PATH = "./configs/inference_pipeline_config.yaml" # use this for inference
 
     with open(USER_QUERY_PATH, "r", encoding="utf-8") as f:
         user_query = f.read()
 
     RAG_chain = ChainRunner(config_path=CONFIG_PATH)
     response = RAG_chain.run(user_query)
-    print(f"response:\n{response.content}")
+    print(f"user query:\n{user_query}")
+    print("*"*40)
+    print(f"response:\n{response['result']}")
+    print("*"*40)
+    print(f"citation:")
+    for i, citation in enumerate(response['citation']):
+        print(f"#{i} \n{citation.page_content}")
 

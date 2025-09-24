@@ -23,10 +23,10 @@ pipeline:
     method: embed
     params:
       model_name: "all-MiniLM-L6-v2"
-      vs_name: "faiss_index"
+      vs_name: "faiss_index_battle_of_stalingrad"
     input:
       split_docs: split_docs
-      persist_vs: False
+      persist_vs: True
     output: vectorstore
 
   - name: retrieving

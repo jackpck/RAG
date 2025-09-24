@@ -25,4 +25,7 @@ will create list of size-one dict instead of dict
 ### no attribute "__pydantic_fields_set__" error
 Remember to set default when setting type setting variables in a class.
 
-
+### langsmith for experimentation
+Less flexible than expected. E.g. not easy to tag each evaluation experiment with the model
+metadata. Also prompt experimentation require deploying the RAG as runnable on langsmith,
+and this requires a paid subscription :(
