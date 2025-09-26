@@ -1,4 +1,4 @@
-from langchain.document_loaders import TextLoader
+from langchain_community.document_loaders import TextLoader
 from langchain_core.documents import Document
 from typing import List
 from src.utils.wikipedia_api_call import WikipediaContent
