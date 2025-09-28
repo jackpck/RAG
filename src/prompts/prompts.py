@@ -51,12 +51,12 @@ contain) and 1 (contain).
 
 True answer:
 \"\"\"
-{0}
+{gold_response}
 \"\"\"
 
 Response:
 \"\"\"
-{1}
+{llm_response}
 \"\"\"
 
 Respond with only the number.

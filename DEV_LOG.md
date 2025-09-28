@@ -29,3 +29,23 @@ Remember to set default when setting type setting variables in a class.
 Less flexible than expected. E.g. not easy to tag each evaluation experiment with the model
 metadata. Also prompt experimentation require deploying the RAG as runnable on langsmith,
 and this requires a paid subscription :(
+
+### mlflow best practice
+- The guiding principle for creating an experiment is the consistency of the input data. 
+  If multiple runs use the same input dataset (even if they utilize different portions of it), 
+  they logically belong to the same experiment. For other hierarchical categorizations, 
+  using tags is advisable.
+  
+when using subprocess, using "python" does not use the right venv. Use `sys.executable` instead
+
+in order to run `create_dataset()`, first create a SQL db using the following command in the 
+root directory:
+
+mlflow server \
+  --backend-store-uri sqlite:///mlflow.db \
+  --default-artifact-root ./mlruns \
+  --host 0.0.0.0 \
+  --port 5000
+
+This will create a mlflow.db in the root directory. Then add `mlflow.set_tracking_uri("sqlite:///mlflow.db")
+` in the script before running `create_dataset()`

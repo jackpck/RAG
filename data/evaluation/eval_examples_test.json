@@ -1,0 +1,12 @@
+{
+  "examples": [
+    {
+      "inputs": {"text": "What is the significance of Pavlov's house?"},
+      "expectations": {"gold":  "Sergeant Pavlov commanded a platoon and fortified a four-story building, which later was dubbed 'Pavlov's House'. It was probably most well-known by General Chuikov's comment that Pavlov's small group of men defended the house and killed more enemy soldiers than the Germans lost in taking Paris."}
+    },
+    {
+      "inputs": {"text": "What did the Red Army learn from the Battle of Stalingrad to which they applied later in Operation Bagration?"},
+      "expectations": {"gold":  "Unable to answer. Question is unanswerable given the scope of the document"}
+    }
+  ]
+}

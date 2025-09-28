@@ -8,3 +8,4 @@ __pycache__
 *.pyo
 DEV_LOG.md
 mlruns
+mlflow.db

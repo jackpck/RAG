@@ -55,10 +55,16 @@ To log the `RunnableSequence` using mlflow, one needs two scripts: 1) set the mo
 `mlflow.models.set_model(chain)` and 2) to log the chain in mlflow from the the first script using
 `mlflow.langchain.log_model(lc_model=<first script name>)`. The reason of setting model from script is
 to avoid serializing (aka pickling) the chain as some components are not serializable. In the root directory,
-run `python -m src.set_model.py` followed by `python -m src.log_model.py`.
+run `python -m src.mlflow.log_model` (this script includes running `subprocess` that will run 
+`python -m src.mlflow.set_model` first.
 
 Note that the artifacts saved will not capture the parameters specified by the yaml files in `configs`
-To log the parameters, `mlflow.log_param()` or `mlflow.log_artifact()` is needed.
+To log the parameters, `mlflow.log_param()` or `mlflow.log_artifact()` is needed. Also, to register the prompts,
+run `python -m src.register_prompt`
+
+All together, run the following command in terminal:
+
+`python -m src.mlflow.register_prompt && python -m src.mlflow.log_model`
 
 ## MVP2
 
@@ -66,8 +72,11 @@ To log the parameters, `mlflow.log_param()` or `mlflow.log_artifact()` is needed
 - ~~Add citation~~  
 - Add metadata to document
 - LLM-as-a-Judge (hallucination, correctness, conciseness)  
-- mlflow  
+- mlflow
+  - ~~set, log and register model~~
+  - experiments and runs
 - pgvector to persist vectorstore
+- add model registration in ci.yml
 
 
 
