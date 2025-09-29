@@ -4,7 +4,7 @@ pipeline:
     method: from_vs
     params:
       model_name: "all-MiniLM-L6-v2"
-      vs_name: "faiss_index_battle_of_stalingrad"
+      vs_name: "faiss_index_google_genai_risk_mgmt"
     input:
     output: vectorstore
 

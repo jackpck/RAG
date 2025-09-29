@@ -2,7 +2,7 @@ import mlflow
 import json
 import subprocess
 
-subprocess.run(["python", "-m", "src.mlflow.set_model"])
+subprocess.run([sys.executable, "-m", "src.mlflow.set_model"])
 
 chain_path = "./src/set_model.py"
 USER_QUERY_PATH = "./src/user_query/user_query.txt"

@@ -4,102 +4,80 @@ import subprocess
 import json
 import sys
 from mlflow.genai import scorer
+from mlflow.genai.scorers import RetrievalGroundedness, RelevanceToQuery
 
 from src.utils.mlflow_loader import load_data, load_prompt
 from src.components.runner import ChainRunner
 from src.utils.validation import LLMJudge
+import configs.experiment_config as config
 
 os.environ["GOOGLE_API_KEY"] = os.environ["GOOGLE_API_KEY"].rstrip()
 
-CONFIG_PATH = "./configs/inference_pipeline_config.yaml"  # use this for inference
-EVAL_DATA_PATH = "./data/evaluation/eval_examples_test.json"
-USER_QUERY_PATH = "./src/user_query/user_query.txt"
-PROMPT_METADATA_PATH = "./src/prompts/prompt_metadata.json"
+mlflow.langchain.autolog() # to enable tracing. Seems to only work with 0.0.354 <= langchain <= 0.3.25
 
-chain_path = "./src/mlflow/set_model.py"
-model_name = "RAG"
-code_paths = ["src/components", "src/utils"]
-
-commit_message = "initial commit"
-version_metadata = {
-    "author": "jackypck93@gmail.com",
-}
-
-data_name = "eval_examples_test"
-experiment_name = "first-experiment"
-experiment_description = "first-experiment"
-experiment_tags = {"mlflow.note.content": experiment_description}
-#run_name = "first-run"
-
-judge_params = {
-    "judge_prompt_name": "LLMJUDGE_PROMPT",
-    "judge_prompt_version": "latest",
-    "judge_model": "gemini-2.5-flash",
-    "judge_model_provider": "google_genai",
-    "judge_temperature": 0,
-    "judge_top_k": 10,
-    "judge_top_p": 0.9
-}
-
-with open(USER_QUERY_PATH, "r", encoding="utf-8") as f:
+with open(config.USER_QUERY_PATH, "r", encoding="utf-8") as f:
     user_query = f.read()
 
-with open(PROMPT_METADATA_PATH, "r", encoding="utf-8") as f:
+with open(config.PROMPT_METADATA_PATH, "r", encoding="utf-8") as f:
     data = f.read()
 prompt_metadata_dict = json.loads(data)
 
 # check experiment
-if (experiment := mlflow.get_experiment_by_name(name=experiment_name)):
+print(f"SET UP EXPERIMENT")
+if (experiment := mlflow.get_experiment_by_name(name=config.experiment_name)):
     experiment_id = experiment.experiment_id
     print(f"experiment exists. get experiment_id")
 else:
     # create experiment
     experiment_id = mlflow.create_experiment(
-        name=experiment_name,
-        tags=experiment_tags,
+        name=config.experiment_name,
+        tags=config.experiment_tags,
     )
     print(f"experiment doesn't exist. new experiment created")
 
 # Load prompts outside of run to property load from mlflow
 # If need to load within run, do: mlflow.set_tracking_uri("sqlite:///mlflow.db")
-judge_prompt = load_prompt(prompt_name=judge_params["judge_prompt_name"],
-                           prompt_version=judge_params["judge_prompt_version"])
+print(f"LOAD PROMPT")
+judge_prompt = load_prompt(prompt_name=config.judge_params["judge_prompt_name"],
+                           prompt_version=config.judge_params["judge_prompt_version"])
 judge_prompt_str = judge_prompt.template
-print(f"load prompt")
 
+print(f"START RUN")
 with mlflow.start_run(experiment_id=experiment_id) as run:
     print(f"Experiment ID: {run.info.experiment_id}\nRun ID: {run.info.run_id}")
 
-    mlflow.log_artifact(local_path=CONFIG_PATH)
-    print(f"log artifact")
+    print(f"lOG ARTIFACT")
+    mlflow.log_artifact(local_path=config.CONFIG_PATH)
 
     # log LLM judge params
-    mlflow.log_params(params=judge_params)
-    print(f"log LLM judge params")
+    print(f"lOG LLM JUDGE PARAMS")
+    mlflow.log_params(params=config.judge_params)
 
     # Load evaluation examples
-    with open(EVAL_DATA_PATH, "r", encoding="utf-8") as f:
+    # mlflow.genai.create_dataset only work with sql db.
+    # set_tracking_uri will mess up the experiment run. To be investigate
+    print(f"lOAD AND LOG EVAL DATA")
+    with open(config.EVAL_DATA_PATH, "r", encoding="utf-8") as f:
         data = f.read()
     examples = json.loads(data)["examples"]
-
-    mlflow.log_artifact(local_path=EVAL_DATA_PATH)
-    print(f"load data")
+    mlflow.log_artifact(local_path=config.EVAL_DATA_PATH)
 
     # Run evaluation
-    RAG_chain = ChainRunner(config_path=CONFIG_PATH)
+    print(f"INSTANTIATE RAG_chain")
+    RAG_chain = ChainRunner(config_path=config.CONFIG_PATH)
     def run_inference(text: str) -> dict:
         response = RAG_chain.run(text)["result"]
         return {"response": response}
-    print(f"instantiate RAG_chain")
 
-    LLM_judge = LLMJudge(model=judge_params["judge_model"],
-                         model_provider=judge_params["judge_model_provider"],
-                         temperature=judge_params["judge_temperature"],
-                         top_k=judge_params["judge_top_k"],
-                         top_p=judge_params["judge_top_p"],
+    print(f"lOAD LLM JUDGE")
+    LLM_judge = LLMJudge(model=config.judge_params["judge_model"],
+                         model_provider=config.judge_params["judge_model_provider"],
+                         temperature=config.judge_params["judge_temperature"],
+                         top_k=config.judge_params["judge_top_k"],
+                         top_p=config.judge_params["judge_top_p"],
                          judge_prompt=judge_prompt_str)
-    print(f"load LLM judge")
 
+    print(f"DEFINE METRICS")
     @scorer
     def accuracy_metric(outputs: dict,
                         expectations: dict):
@@ -107,24 +85,38 @@ with mlflow.start_run(experiment_id=experiment_id) as run:
                                          expectations=expectations,
                                          llm_judge=LLM_judge.llm_judge)
 
+    print(f"GET TRACE")
+    traces = mlflow.search_traces(experiment_ids=[experiment_id],
+                                  run_id=run.info.run_id)
+    print(f"traces:\n{traces}")
+
+    print(f"RUN EVAL")
     results = mlflow.genai.evaluate(
-        data=examples,
-        predict_fn=run_inference,
-        scorers=[accuracy_metric],
+        data=traces,
+        scorers=[RetrievalGroundedness()],
     )
-    print(f"run evaluation")
 
+    ## uncomment below if only using accuracy_metric
+    #results = mlflow.genai.evaluate(
+    #    data=examples,
+    #    predict_fn=run_inference,
+    #    scorers=[accuracy_metric],
+    #)
+
+    print(f"evaluation results:\n{results}")
+
+    print(f"SET MODEL")
+    # save model as code as LLM is not serializable
     subprocess.run([sys.executable, "-m", "src.mlflow.set_model"])
-    print(f"set model")
 
-    prompt_list = [f"prompts:/{judge_params['judge_prompt_name']}@{judge_params['judge_prompt_version']}"
+    print(f"LOG MODEL")
+    prompt_list = [f"prompts:/{config.judge_params['judge_prompt_name']}@{config.judge_params['judge_prompt_version']}"
                    for prompt_name, _ in prompt_metadata_dict.items()]
 
     info = mlflow.langchain.log_model(
-        lc_model=chain_path,
-        name=model_name,
+        lc_model=config.chain_path,
+        name=config.model_name,
         input_example=user_query,
-        code_paths=code_paths,
+        code_paths=config.code_paths,
         prompts=prompt_list,
     )
-    print(f"log model")

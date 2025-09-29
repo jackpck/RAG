@@ -9,3 +9,4 @@ __pycache__
 DEV_LOG.md
 mlruns
 mlflow.db
+data/pdfs/wp_generative_ai_risk_management_in_fs.pdf

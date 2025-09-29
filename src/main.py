@@ -13,12 +13,12 @@ if __name__ == "__main__":
     #os.environ["LANGCHAIN_CALLBACKS_BACKGROUND"] = os.environ["LANGCHAIN_CALLBACKS_BACKGROUND"].rstrip()
 
     #client = Client()
-    mlflow.set_experiment("RAG")
+    mlflow.set_experiment("first pdf RAG")
     mlflow.langchain.autolog()
 
     USER_QUERY_PATH = "./src/user_query/user_query.txt"
-    # CONFIG_PATH = "./configs/pipeline_config.yaml" # use this for experimentation
-    CONFIG_PATH = "./configs/inference_pipeline_config.yaml" # use this for inference
+    CONFIG_PATH = "./configs/pipeline_config.yaml" # use this for experimentation
+    # CONFIG_PATH = "./configs/inference_pipeline_config.yaml" # use this for inference
 
     with open(USER_QUERY_PATH, "r", encoding="utf-8") as f:
         user_query = f.read()

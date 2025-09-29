@@ -29,6 +29,9 @@ class LLMJudge:
                         expectations: dict,
                         llm_judge: BaseChatModel,
                         ) -> bool:
+        """
+        This can be replaced by mlflow.genai.scorers.Correctness
+        """
         try:
             response = llm_judge.invoke({"gold_response":expectations["gold"],
                                          "llm_response":outputs["response"]}).content
