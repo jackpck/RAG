@@ -1,9 +1,14 @@
 import mlflow
 import json
+import argparse
 
 from src.prompts import prompts
 
-commit_message = "SQL-based backend"
+parser = argparse.ArgumentParser()
+parser.add_argument("--commit_msg", type=str, required=True)
+args = parser.parse_args()
+
+commit_message = args.commit_msg
 version_metadata = {
     "author": "jackypck93@gmail.com",
 }

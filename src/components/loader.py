@@ -37,11 +37,12 @@ class DataLoader:
                 if split_from_mid:
                     left_column = page.crop((0, 0, 0.5 * page.width, page.height))
                     right_column = page.crop((0.5 * page.width, 0, page.width, page.height))
-                    docs.append(Document(page_content=left_column.extract_text() + right_column.extract_text()))
+                    text = (left_column.extract_text() + right_column.extract_text()).replace("\n"," ")
+                    docs.append(Document(page_content=text))
                 else:
-                    docs.append(Document(page_content=page.extract_text()))
+                    docs.append(Document(page_content=page.extract_text().replace("\n"," ")))
         for page_num, doc in enumerate(docs):
-            doc.metadata["source"] = page_num
+            doc.metadata["source"] = page_num+1
         return docs
 
 if __name__ == "__main__":
@@ -52,6 +53,6 @@ if __name__ == "__main__":
 
     pdf_path = "data/pdfs/wp_generative_ai_risk_management_in_fs.pdf"
     loader = DataLoader(metadata={})
-    doc = loader.load_from_pdf(pdf_path=pdf_path)
-    print(doc[-2])
+    doc = loader.load_from_pdf(pdf_path=pdf_path, split_from_mid=True)
+    print(doc[-2].metadata["source"])
 

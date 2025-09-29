@@ -13,7 +13,7 @@ import configs.experiment_config as config
 
 os.environ["GOOGLE_API_KEY"] = os.environ["GOOGLE_API_KEY"].rstrip()
 
-mlflow.langchain.autolog() # to enable tracing. Seems to only work with 0.0.354 <= langchain <= 0.3.25
+# mlflow.langchain.autolog() # to enable tracing. Seems to only work with 0.0.354 <= langchain <= 0.3.25
 
 with open(config.USER_QUERY_PATH, "r", encoding="utf-8") as f:
     user_query = f.read()
@@ -46,17 +46,17 @@ print(f"START RUN")
 with mlflow.start_run(experiment_id=experiment_id) as run:
     print(f"Experiment ID: {run.info.experiment_id}\nRun ID: {run.info.run_id}")
 
-    print(f"lOG ARTIFACT")
+    print(f"LOG ARTIFACT")
     mlflow.log_artifact(local_path=config.CONFIG_PATH)
 
     # log LLM judge params
-    print(f"lOG LLM JUDGE PARAMS")
+    print(f"LOG LLM JUDGE PARAMS")
     mlflow.log_params(params=config.judge_params)
 
     # Load evaluation examples
     # mlflow.genai.create_dataset only work with sql db.
     # set_tracking_uri will mess up the experiment run. To be investigate
-    print(f"lOAD AND LOG EVAL DATA")
+    print(f"LOAD AND LOG EVAL DATA")
     with open(config.EVAL_DATA_PATH, "r", encoding="utf-8") as f:
         data = f.read()
     examples = json.loads(data)["examples"]
@@ -69,7 +69,7 @@ with mlflow.start_run(experiment_id=experiment_id) as run:
         response = RAG_chain.run(text)["result"]
         return {"response": response}
 
-    print(f"lOAD LLM JUDGE")
+    print(f"LOAD LLM JUDGE")
     LLM_judge = LLMJudge(model=config.judge_params["judge_model"],
                          model_provider=config.judge_params["judge_model_provider"],
                          temperature=config.judge_params["judge_temperature"],
@@ -85,23 +85,23 @@ with mlflow.start_run(experiment_id=experiment_id) as run:
                                          expectations=expectations,
                                          llm_judge=LLM_judge.llm_judge)
 
-    print(f"GET TRACE")
-    traces = mlflow.search_traces(experiment_ids=[experiment_id],
-                                  run_id=run.info.run_id)
-    print(f"traces:\n{traces}")
+    #print(f"GET TRACE")
+    #traces = mlflow.search_traces(experiment_ids=[experiment_id],
+    #                              run_id=run.info.run_id)
+    #print(f"traces:\n{traces}")
 
     print(f"RUN EVAL")
-    results = mlflow.genai.evaluate(
-        data=traces,
-        scorers=[RetrievalGroundedness()],
-    )
+    #results = mlflow.genai.evaluate(
+    #    data=traces,
+    #    scorers=[RetrievalGroundedness()],
+    #)
 
     ## uncomment below if only using accuracy_metric
-    #results = mlflow.genai.evaluate(
-    #    data=examples,
-    #    predict_fn=run_inference,
-    #    scorers=[accuracy_metric],
-    #)
+    results = mlflow.genai.evaluate(
+        data=examples,
+        predict_fn=run_inference,
+        scorers=[accuracy_metric],
+    )
 
     print(f"evaluation results:\n{results}")
 

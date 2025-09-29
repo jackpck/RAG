@@ -1,1 +1,1 @@
-What are the best ways to evaluate the accuracy of a chatbot?
+How to test vulnerabilities in GenAI models?

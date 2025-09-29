@@ -161,6 +161,8 @@ packaging==25.0
 pandas==2.2.3
 parse==1.20.2
 pathable==0.4.4
+pdfminer.six==20250506
+pdfplumber==0.11.7
 pillow==11.3.0
 platformdirs==4.3.8
 posthog==5.4.0
@@ -181,6 +183,7 @@ pydub==0.25.1
 Pygments==2.19.2
 pyparsing==3.2.5
 pypdf==5.9.0
+pypdfium2==4.30.0
 pyperclip==1.10.0
 PyPika==0.48.9
 pyproject_hooks==1.2.0
@@ -192,7 +195,7 @@ python-magic==0.4.27
 python-multipart==0.0.20
 python-oxmsg==0.0.2
 pytz==2025.2
-pywin32==311
+pywin32==311; platform_system == "Windows"
 PyYAML==6.0.2
 RapidFuzz==3.13.0
 referencing==0.36.2

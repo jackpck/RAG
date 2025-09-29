@@ -50,7 +50,6 @@ class Reranker:
             except:
                 score = 0
             ranked.append((score, doc))
-            time.sleep(6) # to avoid API limit
         ranked.sort(key=lambda x: x[0], reverse=True)
         return [doc for _, doc in ranked[:self.k_rerank]]
 

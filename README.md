@@ -98,7 +98,7 @@ and evaluation.
 - mlflow
   - ~~set, log and register model~~
   - ~~experiments and runs~~
-  - enable tracing
+  - enable tracing (version issue)
 - Add metadata to document
 - LLM-as-a-Judge (hallucination, correctness, retrieval groundedness)
 - pgvector to persist vectorstore
