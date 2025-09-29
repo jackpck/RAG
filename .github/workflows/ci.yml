@@ -58,5 +58,5 @@ jobs:
         with:
           context: .
           push: true
-          tags: jackypck/RAG:latest
+          tags: jackypck/rag:latest
           platforms: linux/amd64,linux/arm64 # allow running on Apple ARM cpu
