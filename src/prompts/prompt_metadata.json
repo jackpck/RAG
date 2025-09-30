@@ -13,5 +13,10 @@
     "description": "LLMJUDGE_PROMPT",
     "prompt_identifier": "system-llmjudge-prompt",
     "tag_list": ["dev","v1","rag"]
+  },
+  "AUTORATER_PROMPT": {
+    "description": "AUTORATER_PROMPT",
+    "prompt_identifier": "system-autorater-prompt",
+    "tag_list": ["dev", "v1", "rag"]
   }
 }

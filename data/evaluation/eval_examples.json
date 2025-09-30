@@ -1,20 +1,28 @@
 {
   "examples": [
     {
-      "inputs": {"text": "How long did the battle of Stalingrad last in days?"},
-      "outputs": {"gold":  "201 days"}
-    },
-    {
       "inputs": {"text": "What is the significance of Pavlov's house?"},
-      "outputs": {"gold":  "Sergeant Pavlov commanded a platoon and fortified a four-story building, which later was dubbed 'Pavlov's House'. It was probably most well-known by General Chuikov's comment that Pavlov's small group of men defended the house and killed more enemy soldiers than the Germans lost in taking Paris."}
+      "expectations": {"gold":  "Sergeant Pavlov commanded a platoon and fortified a four-story building, which later was dubbed 'Pavlov's House'. It was probably most well-known by General Chuikov's comment that Pavlov's small group of men defended the house and killed more enemy soldiers than the Germans lost in taking Paris."}
     },
     {
       "inputs": {"text": "How are the casualties in the Battle of Stalingrad compared to that from the atomic bombing of Hiroshima?"},
-      "outputs": {"gold":  "Russian historian Tayana Pavlova concluded that the losses of the civilian population of Stalingrad are 32.3% higher than that of Hiroshima from the atomic bombing."}
+      "expectations": {"gold":  "Russian historian Tayana Pavlova concluded that the losses of the civilian population of Stalingrad are 32.3% higher than that of Hiroshima from the atomic bombing."}
     },
     {
       "inputs": {"text": "What is the name of the sound/song played by the Soviets to demoralize the German soldiers?"},
-      "outputs": {"gold":  "Tango of Death"}
+      "expectations": {"gold":  "Tango of Death"}
+    },
+    {
+      "inputs": {"text": "Which city is Joseph Stalin born?"},
+      "expectations": {"gold":  "Unable to answer. Question is unanswerable given the scope of the document"}
+    },
+    {
+      "inputs": {"text": "What did the Red Army learn from the Battle of Stalingrad to which they applied later in Operation Bagration?"},
+      "expectations": {"gold":  "Unable to answer. Question is unanswerable given the scope of the document"}
+    },
+    {
+      "inputs": {"text": "How is the Battle of Stalingrad compared with the Battle of Verdun? Given all the examples."},
+      "expectations": {"gold":  "The grind and brutal battle was compared with the Battle of Verdun. The Rynok-Spartanovka region in the north of Stalingrad was referred by the German as 'little Verdun' due to the devastation in the area. It is also remarked that the savage intimacy of the fight was more terrifying than that at Verdun. The casualty in the battle of Stalingrad also far exceeded that of Verdun. Similar to Verdun to the French, Stalingrad has become a symbol for the Soviet."}
     }
   ]
 }

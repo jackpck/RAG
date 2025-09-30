@@ -34,9 +34,6 @@ if __name__ == "__main__":
         data = f.read()
     examples = json.loads(data)["examples"]
 
-    dataset = load_data(data_name=data_name,
-                        examples=examples)
-
     # Run evaluation
     RAG_chain = ChainRunner(config_path=CONFIG_PATH)
     LLM_judge = LLMJudge(model=model,

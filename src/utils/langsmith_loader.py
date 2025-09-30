@@ -21,17 +21,30 @@ def load_prompt(prompt_name: str,
 
 def load_data(data_name: str,
               examples: dict = None) -> Dataset:
+    """
+    load dataset from langsmith
+    :param data_name: data_name of the dataset saved on langsmith. Always need to specify this
+    :param examples: if creating dataset the first time, specify example. This will create and push
+                     the examples to langsmith
+    :return:
+    """
     client = Client()
-    try:
-        dataset = client.read_dataset(dataset_name=data_name)
-    except LangSmithError:
-        dataset = client.create_dataset(dataset_name=data_name)
+    if examples:
+        if not client.has_dataset(dataset_name=data_name):
+            dataset = client.create_dataset(dataset_name=data_name)
+        else:
+            dataset = client.read_dataset(dataset_name=data_name)
         client.create_examples(
             dataset_id=dataset.id,
             examples=examples
         )
         dataset = client.read_dataset(dataset_name=data_name)
-
+    else:
+        try:
+            dataset = client.read_dataset(dataset_name=data_name)
+        except LangSmithError:
+            print("need to push examples to langsmith first. Please specify the examples argument")
+            exit
     return dataset
 
 if __name__ == "__main__":

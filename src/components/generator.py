@@ -27,3 +27,37 @@ class GeneratorLLM:
     @property
     def llm(self):
         return self.system_prompt | self._llm
+
+
+if __name__ == "__main__":
+    import os
+
+    os.environ["GOOGLE_API_KEY"] = os.environ["GOOGLE_API_KEY"].rstrip()
+    os.environ["LANGSMITH_API_KEY"] = os.environ["LANGSMITH_API_KEY"].rstrip()
+    os.environ["LANGSMITH_WORKSPACE_ID"] = os.environ["LANGSMITH_WORKSPACE_ID"].rstrip()
+    os.environ["LANGSMITH_ENDPOINT"] = os.environ["LANGSMITH_ENDPOINT"].rstrip()
+    os.environ["LANGSMITH_PROJECT"] = os.environ["LANGSMITH_PROJECT"].rstrip()
+    os.environ["LANGSMITH_TRACING"] = os.environ["LANGSMITH_TRACING"].rstrip()
+    os.environ["LANGCHAIN_CALLBACKS_BACKGROUND"] = os.environ["LANGCHAIN_CALLBACKS_BACKGROUND"].rstrip()
+
+    model = "gemini-2.5-flash"
+    model_provider = "google_genai"
+    temperature = 0
+    top_k = 10
+    top_p = 0.9
+    prompt_name = "system-system-prompt"
+    prompt_version = "latest"
+
+    generator = GeneratorLLM(model=model,
+                             model_provider=model_provider,
+                             temperature=temperature,
+                             top_k=top_k,
+                             top_p=top_p,
+                             prompt_name=prompt_name,
+                             prompt_version=prompt_version)
+
+    query = {"question":"Where is Moscow?",
+             "context":"Moscow is the capital of Russia and St Petersburg is another big city in Russia."}
+
+    response = generator.llm.invoke(query)
+    print(response)

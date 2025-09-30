@@ -1,6 +1,8 @@
 from langchain.chat_models import init_chat_model
+from langchain_core.language_models.chat_models import BaseChatModel
+from langchain.prompts import ChatPromptTemplate
 
-from src.utils.langsmith_loader import load_prompt
+from src.utils.mlflow_loader import load_prompt
 
 class LLMJudge:
     def __init__(self, model: str,
@@ -8,26 +10,31 @@ class LLMJudge:
                  temperature: float,
                  top_k: int,
                  top_p: float,
-                 prompt_name: str,
-                 prompt_version: str):
-        self.llm_judge = init_chat_model(model=model,
+                 judge_prompt: str,
+                 ):
+        self._llm_judge = init_chat_model(model=model,
                                    model_provider=model_provider,
                                    temperature=temperature,
                                    top_k=top_k,
                                    top_p=top_p)
-        self._setup_prompt(prompt_name, prompt_version)
+        self.judge_prompt = ChatPromptTemplate.from_template(judge_prompt)
 
-    def _setup_prompt(self, prompt_name, prompt_version):
-        prompt = load_prompt(prompt_name, prompt_version)
-        self.judge_prompt = prompt.format_messages()[0].content
+    @property
+    def llm_judge(self):
+        return self.judge_prompt | self._llm_judge
 
-    def accuracy_metric(self, inputs: dict,
+    @staticmethod
+    def accuracy_metric(
                         outputs: dict,
-                        reference_outputs: dict,
+                        expectations: dict,
+                        llm_judge: BaseChatModel,
                         ) -> bool:
+        """
+        This can be replaced by mlflow.genai.scorers.Correctness
+        """
         try:
-            response = self.llm_judge.invoke(self.judge_prompt.format(reference_outputs["gold"],
-                                                                outputs["response"])).content
+            response = llm_judge.invoke({"gold_response":expectations["gold"],
+                                         "llm_response":outputs["response"]}).content
             score = int(response)
         except:
             score = 0
@@ -39,33 +46,39 @@ if __name__ == "__main__":
     import os
 
     os.environ["GOOGLE_API_KEY"] = os.environ["GOOGLE_API_KEY"].rstrip()
-    os.environ["LANGSMITH_API_KEY"] = os.environ["LANGSMITH_API_KEY"].rstrip()
-    os.environ["LANGSMITH_WORKSPACE_ID"] = os.environ["LANGSMITH_WORKSPACE_ID"].rstrip()
-    os.environ["LANGSMITH_ENDPOINT"] = os.environ["LANGSMITH_ENDPOINT"].rstrip()
-    os.environ["LANGSMITH_PROJECT"] = os.environ["LANGSMITH_PROJECT"].rstrip()
-    os.environ["LANGSMITH_TRACING"] = os.environ["LANGSMITH_TRACING"].rstrip()
-    os.environ["LANGCHAIN_CALLBACKS_BACKGROUND"] = os.environ["LANGCHAIN_CALLBACKS_BACKGROUND"].rstrip()
 
-    model = "gemini-2.5-flash"
-    model_provider = "google_genai"
-    temperature = 0
-    top_k = 10
-    top_p = 0.9
-    judge_prompt_name = "system-llmjudge-prompt"
-    judge_prompt_version = "latest"
+    judge_params = {
+        "judge_prompt_name": "LLMJUDGE_PROMPT",
+        "judge_prompt_version": "latest",
+        "judge_model": "gemini-2.5-flash",
+        "judge_model_provider": "google_genai",
+        "judge_temperature": 0,
+        "judge_top_k": 10,
+        "judge_top_p": 0.9
+    }
 
-    LLM_judge = LLMJudge(model=model,
-                         model_provider=model_provider,
-                         temperature=temperature,
-                         top_k=top_k,
-                         top_p=top_p,
-                         prompt_name=judge_prompt_name,
-                         prompt_version=judge_prompt_version)
+    judge_prompt = load_prompt(prompt_name=judge_params["judge_prompt_name"],
+                               prompt_version=judge_params["judge_prompt_version"])
+    judge_prompt_str = judge_prompt.template
+    print(f"load prompt")
+
+    dataset = load_data(name=data_name,
+                        experiment_id=experiment_id,
+                        tags=experiment_tags,
+                        test_cases=examples)
+
+    LLM_judge = LLMJudge(model=judge_params["judge_model"],
+                         model_provider=judge_params["judge_model_provider"],
+                         temperature=judge_params["judge_temperature"],
+                         top_k=judge_params["judge_top_k"],
+                         top_p=judge_params["judge_top_p"],
+                         judge_prompt=judge_prompt_str)
+    print(f"load LLM judge")
 
     llm_response = "The Battle of Stalingrad lasted from 17 July 1942 to 2 February 1943, which is 201 days."
     gold_response = "201 days"
-    result = LLM_judge.accuracy_metric(inputs={},
-                                       outputs={"response":llm_response},
-                                       reference_outputs={"gold":gold_response})
+    result = LLM_judge.accuracy_metric(outputs={"response":llm_response},
+                                       expectations={"gold":gold_response},
+                                       llm_judge=LLM_judge.llm_judge)
 
     print(result)

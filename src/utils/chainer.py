@@ -9,14 +9,15 @@ def chain_from_yaml(config_path: str):
 
     def get_arg(x, component_outputs, inputs):
         args = {}
-        for k, v in inputs.items():
-            if k in component_outputs:
-                args[k] = x["context"]
-            else:
-                if v:  # first component, input (title) is given
-                    args[k] = v
-                else:  # reranker component, input (query) is empty
-                    args[k] = x["question"]
+        if inputs:
+            for k, v in inputs.items():
+                if k in component_outputs:
+                    args[k] = x["context"]
+                else:
+                    if v:  # first component, input (title) is given
+                        args[k] = v
+                    else:  # reranker component, input (query) is empty
+                        args[k] = x["question"]
         return args
 
     component_outputs = set()
@@ -38,22 +39,25 @@ def chain_from_yaml(config_path: str):
             instance = cls()
 
         method = getattr(instance, method_name)
-        if outputs:
+        if outputs: # first to last - 1 steps
             component_lambda = lambda x, i=i, inputs=inputs, component_outputs=component_outputs, method=method: \
                 {"question": x if i == 0 else x["question"],
                  "context": method(**get_arg(x=x,
                                              component_outputs=component_outputs,
                                              inputs=inputs))}
-            component_runnables.append(RunnableLambda(component_lambda).with_config(run_name=step_name,
-                                                                                    metadata=params))
             if isinstance(outputs, dict):
                 output_key = list(outputs.values())[0]
                 component_outputs.add(output_key)
             else:
                 component_outputs.add(outputs)
         else: # last step, call system_prompt | llm
-            component_runnables.append(method.with_config(run_name=step_name,
-                                                            metadata=params))
+            component_lambda = lambda x, method=method: \
+                {"citation": x["context"],
+                 "result": method.invoke({"question": x["question"],
+                                          "context": x["context"]}).content}
+
+        component_runnables.append(RunnableLambda(component_lambda).with_config(run_name=step_name,
+                                                                                metadata=params))
 
     return RunnableSequence(*component_runnables)
 

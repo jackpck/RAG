@@ -1,12 +1,12 @@
-from langchain.vectorstores import FAISS
-from langchain.embeddings import HuggingFaceBgeEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain_huggingface import HuggingFaceEmbeddings
 from typing import List
 from langchain_core.documents import Document
 
 class DocEmbedder:
     def __init__(self, model_name: str,
                  vs_name: str):
-        self.embedding_model = HuggingFaceBgeEmbeddings(model_name=model_name)
+        self.embedding_model = HuggingFaceEmbeddings(model_name=model_name)
         self.vs_name = vs_name
 
     def embed(self, split_docs: List[Document],

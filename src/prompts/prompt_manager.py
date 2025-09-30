@@ -39,10 +39,13 @@ if action == "push":
         else:
             raise ValueError("prompt_type must be 'system' or 'user'")
         prompt = ChatPromptTemplate.from_messages([message])
-        client.push_prompt(prompt_identifier=prompt_identifier,
-                           object=prompt,
-                           description=prompt_metadata["description"],
-                           tags=prompt_metadata["tag_list"])
+        try:
+            client.push_prompt(prompt_identifier=prompt_identifier,
+                               object=prompt,
+                               description=prompt_metadata["description"],
+                               tags=prompt_metadata["tag_list"])
+        except:
+            continue
 elif action == "pull":
     # below is a demonstration of passing the pulled prompt to an LLM
 
