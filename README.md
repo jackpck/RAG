@@ -64,6 +64,13 @@ one can use `configs/inference_pipeline_config.yaml`, which starts from retreiva
 All LLM are initialized by the `init_chat_model` method from langchain. Inference is made via making API call
 to the selected model (gemini-2.5-flash for MVP1)
 
+**Note on `pipeline_config.yaml` format**
+
+The second to last component output variable should be named `context`. The last component,
+which is the LLM generator, must have `context` and `question` as the two inputs. This is to
+make sure it follows the variable names in the generator prompt. Also the output of the last
+component must be empty.
+
 ### Evaluation
 User can specify examples of query-gold response pair in `data/evaluation/eval_examples.json` for evaluation. 
 Once examples are given, run `evaluations/eval.py`, which uses LLM-as-a-Judge to determine if the response 
@@ -101,9 +108,9 @@ and evaluation.
   - enable tracing (version issue)
 - Add metadata to document
 - LLM-as-a-Judge (hallucination, correctness, retrieval groundedness)
-- pgvector to persist vectorstore
 - add model registration to ci.yml
 - add pdf reader: domain expert RAG
+- use external storage (pgvector, MongoDB)
 
 
 

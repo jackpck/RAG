@@ -1,8 +1,10 @@
 from langchain_core.documents import Document
 from typing import List
 from langchain.chat_models import init_chat_model
+import asyncio
 
 from src.utils.langsmith_loader import load_prompt
+from src.utils.syncify import syncify
 
 class Autorater:
     """
@@ -28,20 +30,22 @@ class Autorater:
         prompt = load_prompt(prompt_name, prompt_version)
         self.autorater_prompt = prompt.format_messages()[0].content
 
-    def autorate(self,
-                 reranked_document: List[Document],
-                 query: str) -> List[Document]:
+    @syncify
+    async def autorate(self,
+                 reranked_document: List[str],
+                 query: str) -> List[str]:
 
-        sufficient_doc = []
-        for doc in reranked_document:
+        async def score_doc(doc):
             try:
-                response = self.autorater_llm.invoke(self.autorater_prompt.format(query, doc)).content
+                response = await self.autorater_llm.ainvoke(self.autorater_prompt.format(query, doc)).content
                 score = int(response)
             except:
                 score = 0
-            if score == 1:
-                sufficient_doc.append(doc)
-        return sufficient_doc
+            return (score, doc)
+
+        rated_tasks = [score_doc(doc) for doc in reranked_document]
+        rated = await asyncio.gather(*rated_tasks)
+        return [d[1] for d in rated if d[0] == 1]
 
 
 

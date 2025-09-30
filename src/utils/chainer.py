@@ -51,10 +51,11 @@ def chain_from_yaml(config_path: str):
             else:
                 component_outputs.add(outputs)
         else: # last step, call system_prompt | llm
-            component_lambda = lambda x, method=method: \
+            component_lambda = lambda x, inputs=inputs, component_outputs=component_outputs, method=method: \
                 {"citation": x["context"],
-                 "result": method.invoke({"question": x["question"],
-                                          "context": x["context"]}).content}
+                 "result": method(**get_arg(x=x,
+                                            component_outputs=component_outputs,
+                                            inputs=inputs))}
 
         component_runnables.append(RunnableLambda(component_lambda).with_config(run_name=step_name,
                                                                                 metadata=params))

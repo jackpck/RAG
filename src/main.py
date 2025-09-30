@@ -9,8 +9,8 @@ if __name__ == "__main__":
     mlflow.langchain.autolog()
 
     USER_QUERY_PATH = "./src/user_query/user_query.txt"
-    CONFIG_PATH = "./configs/pipeline_config.yaml" # use this for experimentation
-    # CONFIG_PATH = "./configs/inference_pipeline_config.yaml" # use this for inference
+    # CONFIG_PATH = "./configs/pipeline_config.yaml" # use this for experimentation
+    CONFIG_PATH = "./configs/inference_pipeline_config.yaml" # use this for inference
 
     with open(USER_QUERY_PATH, "r", encoding="utf-8") as f:
         user_query = f.read()
@@ -23,7 +23,7 @@ if __name__ == "__main__":
     print("*"*40)
     print(f"citation:")
     for i, citation in enumerate(response['citation']):
-        print(f"#{i} \n{citation.page_content}")
+        print(f"#{i} \n{citation}")
 
     # save model as code for logging in mlflow
     # mlflow.models.set_model(RAG_chain.rag_chain)
