@@ -2,7 +2,7 @@ from langchain.chat_models import init_chat_model
 from langchain_core.prompts import ChatPromptTemplate
 
 from src.utils.langsmith_loader import load_prompt
-from src.utils.syncify import syncify
+from src.utils.syncify import sync
 
 class GeneratorLLM:
     def __init__(self,
@@ -29,7 +29,7 @@ class GeneratorLLM:
     def llm(self):
         return self.system_prompt | self._llm
 
-    @syncify
+    @sync
     async def generate(self, context: str, question: str) -> str:
         pipe = self.system_prompt | self._llm
         response = await pipe.ainvoke({"question": question,

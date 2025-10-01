@@ -1,7 +1,7 @@
 import asyncio
 from functools import wraps
 
-def syncify(func):
+def sync(func):
     """
     Decorator to turn an async function into a sync function using asyncio.run.
     """

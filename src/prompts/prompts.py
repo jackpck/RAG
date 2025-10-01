@@ -25,22 +25,23 @@ Respond with only the number
 """
 
 AUTORATER_PROMPT = """
-We define context as 'sufficient' if it contains all OR partially contains the necessary information 
-to provide a definitive answer to the query and 'insufficient' if it lacks the 
+We define context as 'sufficient' if it contains all the OR partial necessary information 
+to provide a definitive answer to the query and 'insufficient' if it lacks all the 
 necessary information, is inconclusive, or contains contradictory information. 
 
-TASK: Given the context-query pair below, determine if it is sufficient (score = 1) or 
+TASK: Given the query below, determine if the context is sufficient (score = 1) or 
 insufficient (score = 0)
 
-Context:
+Query:
 \"\"\"
 {0}
 \"\"\"
 
-Query:
+Context:
 \"\"\"
 {1}
 \"\"\"
+
 
 Response with only the score number.
 """

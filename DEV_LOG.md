@@ -49,3 +49,7 @@ mlflow server \
 
 This will create a mlflow.db in the root directory. Then add `mlflow.set_tracking_uri("sqlite:///mlflow.db")
 ` in the script before running `create_dataset()`
+
+
+do not do `await llm.ainvoke(query).content` as `await` only bind to `llm.ainvoke` but not `content`.
+do `response = await llm.ainvoke(query)` and `response = response.content` instead.

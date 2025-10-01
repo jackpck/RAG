@@ -47,10 +47,19 @@ try:
                 """
                 stream = RAG.astream(message_input)
                 async for chunk in stream:
-                    try:
-                        yield chunk["result"].replace("$","\$")
-                    except:
-                        pass
+                    if "result" in chunk:
+                        try:
+                            result = chunk['result'].replace('$','\$')
+                            yield f"\n\n Response \n: {result}"
+                        except:
+                            pass
+
+                    if "citation" in chunk:
+                        citations = chunk["citation"]
+                        if isinstance(citations, list):
+                            yield f"\n\n Citations: " + "\n-".join(citations)
+                        else:
+                            yield f"\n\n Citations: \n-{citations}"
 
             print(f"write stream")
             response = st.write_stream(get_stream_response())
