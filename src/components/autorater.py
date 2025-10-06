@@ -32,12 +32,12 @@ class Autorater:
 
     @sync
     async def autorate(self,
-                 reranked_document: List[str],
-                 query: str) -> List[str]:
+                 reranked_document: List[Document],
+                 query: str) -> List[Document]:
 
         async def score_doc(query, doc):
             try:
-                response = await self.autorater_llm.ainvoke(self.autorater_prompt.format(query, doc))
+                response = await self.autorater_llm.ainvoke(self.autorater_prompt.format(query, doc.page_content))
                 score = int(response.content)
             except:
                 score = 0

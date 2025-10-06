@@ -1,6 +1,5 @@
 from langchain_core.runnables.base import RunnableSerializable
 from src.utils.chainer import chain_from_yaml
-import asyncio
 
 from src.utils.syncify import sync
 

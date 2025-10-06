@@ -106,12 +106,14 @@ and evaluation.
   - ~~set, log and register model~~
   - ~~experiments and runs~~
   - enable tracing (version issue)
-- Add metadata to document
+- ~~Add metadata to document~~
 - LLM-as-a-Judge (hallucination, correctness, retrieval groundedness)
-- add model registration to ci.yml
-- add pdf reader: domain expert RAG
-- use external storage (pgvector, MongoDB)
+- ~~add pdf reader: domain expert RAG~~
+- serverless storage pgvector (neon)
 
+## MVP3
 
+- Agentic RAG (modulized)
+- Graph RAG
 
 

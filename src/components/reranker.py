@@ -40,18 +40,18 @@ class Reranker:
 
     @sync
     async def rerank(self, retriever: VectorStoreRetriever,
-                     query: str) -> List[str]:
+                     query: str) -> List[Document]:
         retrieved_docs = retriever.invoke(query)
 
-        async def score_doc(doc):
+        async def score_doc(doc: Document) -> tuple[int, Document]:
             try:
-                response = await self.rerank_llm.ainvoke(self.reranker_prompt.format(query, doc))
+                response = await self.rerank_llm.ainvoke(self.reranker_prompt.format(query, doc.page_content))
                 score = int(response.content)
             except:
                 score = 0
             return (score, doc)
 
-        ranked_tasks = [score_doc(doc.page_content) for doc in retrieved_docs]
+        ranked_tasks = [score_doc(doc) for doc in retrieved_docs]
         ranked = await asyncio.gather(*ranked_tasks)
         ranked.sort(key=lambda x: x[0], reverse=True)
         return [doc for _, doc in ranked[:self.k_rerank]]

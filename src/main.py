@@ -21,13 +21,14 @@ if __name__ == "__main__":
 
     RAG_chain = ChainRunner(config_path=CONFIG_PATH)
     response = RAG_chain.run(user_query)
-    print(f"user query:\n{user_query}")
+    print(f"User query:\n{user_query}")
     print("*"*40)
-    print(f"response:\n{response['result'].content}")
+    print(f"Response:\n{response['result'].content}")
     print("*"*40)
-    print(f"citation:")
+    print(f"Citation:")
     for i, citation in enumerate(response['citation']):
-        print(f"#{i} \n{citation}")
+        print(f"Reference #{i+1}: page {citation.metadata['source']} \n{citation.page_content}")
+        print('-'*20)
 
     # save model as code for logging in mlflow
     # mlflow.models.set_model(RAG_chain.rag_chain)

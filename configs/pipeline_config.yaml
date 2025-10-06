@@ -27,7 +27,7 @@ pipeline:
       vs_name: "faiss_index_google_genai_risk_mgmt"
     input:
       split_docs: split_docs
-      persist_vs: True
+      persist_vs: "serverless"
     output: vectorstore
 
   - name: retrieving
