@@ -7,19 +7,22 @@ class NeonPostgres:
                  user: str,
                  password: str,
                  host: str,
-                 port: str):
+                 port: str,
+                 sslmode: str):
         self._setup_connection(dbname=dbname,
                                 user=user,
                                 password=password,
                                 host=host,
-                                port=port)
+                                port=port,
+                                sslmode=sslmode)
 
-    def _setup_connection(self, dbname, user, password, host, port):
+    def _setup_connection(self, dbname, user, password, host, port, sslmode):
         self.conn = psycopg2.connect(dbname=dbname,
                                     user=user,
                                     password=password,
                                     host=host,
-                                    port=port)
+                                    port=port,
+                                    sslmode=sslmode)
         self.cur = self.conn.cursor()
         return self.conn
 

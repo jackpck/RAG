@@ -1,14 +1,19 @@
 import os
 from urllib.error import URLError
 import streamlit as st
-from langchain_core.messages import HumanMessage
 import datetime
 
 from src.components.runner import ChainRunner
 from src.utils.sql_connection import NeonPostgres
-from credentials import db_config
 
 os.environ["GOOGLE_API_KEY"] = os.environ["GOOGLE_API_KEY"].rstrip()
+DB_NAME = os.environ["DB_NAME"].rstrip()
+DB_USER = os.environ["DB_USER"].rstrip()
+DB_PWD = os.environ["DB_PWD"].rstrip()
+DB_HOST = os.environ["DB_HOST"].rstrip()
+DB_PORT = os.environ["DB_PORT"].rstrip()
+DB_ENDPOINT = os.environ["DB_ENDPOINT"].rstrip()
+
 
 model = "gemini-2.5-flash"
 model_provider = "google_genai"
@@ -33,11 +38,12 @@ try:
 
     RAG = ChainRunner(config_path=CONFIG_PATH).rag_chain
 
-    neon_db = NeonPostgres(dbname=db_config.db_name,
-                           user=db_config.db_user,
-                           password=db_config.db_pwd,
-                           host=db_config.db_host,
-                           port=db_config.db_port)
+    neon_db = NeonPostgres(dbname=DB_NAME,
+                           user=DB_USER,
+                           password=DB_PWD,
+                           host=DB_HOST,
+                           port=DB_PORT,
+                           sslmode="require",)
 
     if "model" not in st.session_state:
         st.session_state["model"] = model
