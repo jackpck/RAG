@@ -10,6 +10,9 @@ The structure of the repo allows for easy customized experimentation, including 
 parameter tuning, prompt engineering etc. The structure also enables easy setup of unit tests. The repo also
 contains tracing and versioning capability, enabling rigorous experimentation and iterations.
 
+A user feedback feature is also added to the chatbot to allow user to share feedback on the LLM response. User
+feedback, together with the input and LLM response are logged on a serverless (neon) postgreSQL database.
+
 [**MVP2 Update**] langsmith is no longer used for experimentation and evaluation. We have switched to
 *mlflow* instead.
 
@@ -18,6 +21,7 @@ contains tracing and versioning capability, enabling rigorous experimentation an
   Modularity is further enhanced using **dynamic chaining**
 - **mlflow** is used for experimentation and model versioning in MVP2  
 
+![Alt text](./static/RAG_pipeline.png)
 ---
 
 # \*\*MVP 1 README blow\*\*
@@ -109,10 +113,11 @@ and evaluation.
 - ~~Add metadata to document~~
 - LLM-as-a-Judge (hallucination, correctness, retrieval groundedness)
 - ~~add pdf reader: domain expert RAG~~
-- serverless storage pgvector (neon)
+- ~~serverless storage pgvector (neon)~~
 
 ## MVP3
 
+- user feedback to neon
 - Agentic RAG (modulized)
 - Graph RAG
 
