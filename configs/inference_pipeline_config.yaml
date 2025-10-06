@@ -49,11 +49,11 @@ pipeline:
     input:
       reranked_document: reranked_document
       query:
-    output: autorated_document
+    output: context
 
   - name: generating
     class: src.components.generator.GeneratorLLM
-    method: llm
+    method: generate
     params:
       model: "gemini-2.5-flash"
       model_provider: "google_genai"
@@ -63,5 +63,7 @@ pipeline:
       prompt_name: "system-system-prompt"
       prompt_version: "latest"
     input:
+      context: context
+      question:
     output:
 

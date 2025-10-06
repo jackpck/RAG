@@ -10,6 +10,9 @@ The structure of the repo allows for easy customized experimentation, including 
 parameter tuning, prompt engineering etc. The structure also enables easy setup of unit tests. The repo also
 contains tracing and versioning capability, enabling rigorous experimentation and iterations.
 
+A user feedback feature is also added to the chatbot to allow user to share feedback on the LLM response. User
+feedback, together with the input and LLM response are logged on a serverless (neon) postgreSQL database.
+
 [**MVP2 Update**] langsmith is no longer used for experimentation and evaluation. We have switched to
 *mlflow* instead.
 
@@ -18,6 +21,7 @@ contains tracing and versioning capability, enabling rigorous experimentation an
   Modularity is further enhanced using **dynamic chaining**
 - **mlflow** is used for experimentation and model versioning in MVP2  
 
+![Alt text](./static/RAG_pipeline.png)
 ---
 
 # \*\*MVP 1 README blow\*\*
@@ -64,6 +68,13 @@ one can use `configs/inference_pipeline_config.yaml`, which starts from retreiva
 All LLM are initialized by the `init_chat_model` method from langchain. Inference is made via making API call
 to the selected model (gemini-2.5-flash for MVP1)
 
+**Note on `pipeline_config.yaml` format**
+
+The second to last component output variable should be named `context`. The last component,
+which is the LLM generator, must have `context` and `question` as the two inputs. This is to
+make sure it follows the variable names in the generator prompt. Also the output of the last
+component must be empty.
+
 ### Evaluation
 User can specify examples of query-gold response pair in `data/evaluation/eval_examples.json` for evaluation. 
 Once examples are given, run `evaluations/eval.py`, which uses LLM-as-a-Judge to determine if the response 
@@ -99,12 +110,15 @@ and evaluation.
   - ~~set, log and register model~~
   - ~~experiments and runs~~
   - enable tracing (version issue)
-- Add metadata to document
+- ~~Add metadata to document~~
 - LLM-as-a-Judge (hallucination, correctness, retrieval groundedness)
-- pgvector to persist vectorstore
-- add model registration to ci.yml
-- add pdf reader: domain expert RAG
+- ~~add pdf reader: domain expert RAG~~
+- ~~serverless storage pgvector (neon)~~
 
+## MVP3
 
+- user feedback to neon
+- Agentic RAG (modulized)
+- Graph RAG
 
 

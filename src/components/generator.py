@@ -1,7 +1,10 @@
 from langchain.chat_models import init_chat_model
 from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.documents import Document
+from typing import List
 
 from src.utils.langsmith_loader import load_prompt
+from src.utils.syncify import sync
 
 class GeneratorLLM:
     def __init__(self,
@@ -27,6 +30,14 @@ class GeneratorLLM:
     @property
     def llm(self):
         return self.system_prompt | self._llm
+
+    @sync
+    async def generate(self, context: List[Document], question: str) -> str:
+        pipe = self.system_prompt | self._llm
+        context_str = [c.page_content for c in context]
+        response = await pipe.ainvoke({"question": question,
+                                 "context": context_str})
+        return response
 
 
 if __name__ == "__main__":
