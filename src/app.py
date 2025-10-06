@@ -16,6 +16,9 @@ CONFIG_PATH = "./configs/inference_pipeline_config.yaml"
 tablename = "chatbot_log"
 
 def add_feedback():
+    """
+    callback function: trigger when the feedback value is changed (e.g. user click thumbs up/down)
+    """
     feedback = st.session_state.feedback_value
     neon_db.cur.execute(f"""
         UPDATE {tablename}
@@ -90,7 +93,7 @@ try:
             feedback = st.feedback(
                 "thumbs",
                 key=f"feedback_value",
-                on_change=add_feedback,
+                on_change=add_feedback, # trigger callback when feedback value changes
             )
 
             st.session_state.messages.append({"role": "assistant",
