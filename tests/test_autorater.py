@@ -1,5 +1,6 @@
 import os
 import pytest
+from langchain_core.documents import Document
 
 from src.components.autorater import Autorater
 
@@ -8,14 +9,15 @@ os.environ["GOOGLE_API_KEY"] = os.environ["GOOGLE_API_KEY"].rstrip()
 
 @pytest.fixture()
 def my_doc():
-    test_doc = ["the apple is in the box",
-                "the banana is on the tree",
-                "the apple is red"]
+    test_doc_str = ["the apple is in the box",
+                    "the banana is on the tree",
+                    "the apple is red"]
+    test_doc = list(map(lambda s: Document(page_content=s), test_doc_str))
     return test_doc
 
 @pytest.fixture()
 def my_query():
-    test_query = "where can I find the apple?"
+    test_query = Document(page_content="where can I find the apple?")
     return test_query
 
 
@@ -32,7 +34,7 @@ def test_autorater(my_doc, my_query):
     autorater = Autorater(**model_config)
     context = autorater.autorate(reranked_document=my_doc,
                                  query=my_query)
-    assert context == ['the apple is in the box']
+    assert context == [Document(page_content='the apple is in the box')]
 
 
 

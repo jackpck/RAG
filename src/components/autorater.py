@@ -55,10 +55,12 @@ if __name__ == "__main__":
     #test_doc = "model development process. Regulators should consider and amplify the importance of the following considerations and strategies when firms are establishing these foundational processes: ● Socio-technical Considerations: Managing AI risks requires a comprehensive approach that integrates both technical and social factors. NIST has identified a series of “trustworthiness characteristics” — including (1) valid and reliable, (2) safe, secure and resilient, (3) accountable and transparent, (4) explainable and interpretable, (5) privacy-enhanced, and (6) fair with harmful bias managed. According to NIST, “[c]reating trustworthy AI requires balancing each of these characteristics based on the AI system’s context of use. While all characteristics are socio-technical system attributes, accountability and transparency also relate to the processes and activities internal to an AI system and its external setting. Neglecting these characteristics can increase the probability and magnitude of",
     #test_query = "What are the six points of Socio-technical Considerations that the regulators should consider?"
 
-    test_doc = ["the apple is in the box",
-                "the banana is on the tree",
-                "the apple is red"]
-    test_query = "where can I find the apple?"
+    test_doc_str = ["the apple is in the box",
+                    "the banana is on the tree",
+                    "the apple is red"]
+    test_doc = list(map(lambda s: Document(page_content=s), test_doc_str))
+    print(test_doc)
+    test_query = Document(page_content="where can I find the apple?")
 
     model_config = {
         "model_autorate": "gemini-2.5-flash",
