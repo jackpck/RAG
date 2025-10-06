@@ -24,7 +24,7 @@ feedback, together with the input and LLM response are logged on a serverless (n
 ![Alt text](./static/RAG_pipeline.png)
 ---
 
-# \*\*MVP 1 README blow\*\*
+# \*\*MVP 1 README below\*\*
 
 ## Introduction
 
