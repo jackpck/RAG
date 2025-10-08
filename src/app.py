@@ -86,7 +86,6 @@ try:
 
                     if "citation" in chunk:
                         citations = chunk["citation"]
-                        print(f"citations: {citations}")
                         if isinstance(citations, list):
                             citation_source = [cite.page_content for cite in citations]
                             yield f"\n\n Citations: " + "\n-".join(citation_source)

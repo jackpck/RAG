@@ -39,9 +39,17 @@ class Reranker:
         self.reranker_prompt = prompt.format_messages()[0].content
 
     @sync
-    async def rerank(self, retriever: VectorStoreRetriever,
+    async def rerank(self, retriever: VectorStoreRetriever | str,
                      query: str) -> List[Document]:
-        retrieved_docs = retriever.invoke(query)
+
+        if isinstance(retriever, VectorStoreRetriever):
+            # FAISS vectorstore
+            retrieved_docs = retriever.invoke(query)
+        elif isinstance(retriever, str):
+            # postgres database
+            # TODO get query_embedding
+            # query_embedding = ...
+            # cur.execute(retriever, (query_embedding,))
 
         async def score_doc(doc: Document) -> tuple[int, Document]:
             try:
