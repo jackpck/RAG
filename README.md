@@ -13,6 +13,8 @@ contains tracing and versioning capability, enabling rigorous experimentation an
 A user feedback feature is also added to the chatbot to allow user to share feedback on the LLM response. User
 feedback, together with the input and LLM response are logged on a serverless (neon) postgreSQL database.
 
+Vector embeddings are now stored as `pgvector` on a serverless PostgresSQL database instead of locally.
+
 [**MVP2 Update**] langsmith is no longer used for experimentation and evaluation. We have switched to
 *mlflow* instead.
 
@@ -20,6 +22,14 @@ feedback, together with the input and LLM response are logged on a serverless (n
 - **Langchain**, specifically **LCEL** (LangChain Expression Language) as the main development framework.
   Modularity is further enhanced using **dynamic chaining**
 - **mlflow** is used for experimentation and model versioning in MVP2  
+- **Langsmith** is used for prompt versioning
+- **neon** is used for logging user feedback and persisting vector embedding 
+
+## Instructions
+- The `pipeline_config.yaml` is now splitted into `embedding_pipeline_config.yaml` which creating vector embeddings
+of the document chunks and stored on the serverless PostgreSQL database, and `inference_pipeline_config.yaml` which
+start from the retriever, retrieving top k chunks to the generation of the final response.
+- mlflow user interface can be accessed through the command `mlflow ui`
 
 ![Alt text](./static/RAG_pipeline.png)
 ---
@@ -37,6 +47,7 @@ This can easily be done due to the highly modulized structure of the code.
 the structure of the repo allows for easy customized experimentation, including addition of new components,
   parameter tuning, prompt engineering etc. Using the langchain tech stack provides a seamless connection 
 to the langsmith UI for tracing and evaluation capabilities.
+
 
 ## Tech stack
 - **Langchain**, specifically **LCEL** (LangChain Expression Language) as the main development framework.

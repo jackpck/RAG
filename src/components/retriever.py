@@ -1,6 +1,9 @@
 from langchain_community.vectorstores import FAISS
+from langchain_core.documents import Document
 from langchain.vectorstores.base import VectorStoreRetriever
 from langchain_huggingface import HuggingFaceEmbeddings
+import os
+from typing import List
 
 from src.utils.sql_connection import NeonPostgres
 
@@ -33,27 +36,31 @@ class PostgresRetriever:
         self.tablename = tablename
         self.embedding_model = HuggingFaceEmbeddings(model_name=embedding_model_name)
 
-    def retriever(self, query: str, k: int):
+    def retrieve(self, query: str, k_retrieval: int) -> List[Document]:
         retrieval_query = f"""
-            SELECT document_id, content
+            SELECT document_id, content, metadata AS page
             FROM {self.tablename}
-            ORDER BY embedding <-> %s
-            LIMIT {k};
+            ORDER BY embedding <-> %s::vector
+            LIMIT {k_retrieval};
         """
         query_embedding = self.embedding_model.embed_query(query)
-        retrieved_doc = self.neon_db.cur.execute(retrieval_query, (query_embedding,))
-        return retrieved_doc
+        self.neon_db.cur.execute(retrieval_query, (query_embedding,))
+        retrieved_docs = self.neon_db.cur.fetchall()
+        return [Document(page_content=doc[1], metadata={"source":doc[2]}) for doc in retrieved_docs]
 
 
 if __name__ == "__main__":
-    tablename = ""
+    tablename = "faiss_index_google_genai_risk_mgmt"
     model_name = "all-MiniLM-L6-v2"
     retriever = PostgresRetriever(tablename=tablename,
                                   embedding_model_name=model_name)
 
-    user_input = ""
+    user_input = "What are the top risks in GenAI?"
     top_k = 5
-    df_retrieved = retriever.retriever(query=user_input,
-                                       k=top_k)
+    df_retrieved = retriever.retrieve(query=user_input,
+                                       k_retrieval=top_k)
 
+    for row in df_retrieved:
+        print(row)
+        print("*"*40)
 
