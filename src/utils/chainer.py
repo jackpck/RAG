@@ -17,7 +17,10 @@ def chain_from_yaml(config_path: str):
                     if v:  # first component, input (title) is given
                         args[k] = v
                     else:  # reranker component, input (query) is empty
-                        args[k] = x["question"]
+                        if isinstance(x, dict) and "question" in x:
+                            args[k] = x["question"] # reranker component
+                        else:
+                            args[k] = x # retriever component in inference pipeline
         return args
 
     component_outputs = set()

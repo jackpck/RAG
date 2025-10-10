@@ -1,22 +1,14 @@
 pipeline:
-  - name: embedding
-    class: src.components.embedder.DocEmbedder
-    method: from_vs
-    params:
-      model_name: "all-MiniLM-L6-v2"
-      vs_name: "faiss_index_google_genai_risk_mgmt"
-    input:
-    output: vectorstore
-
   - name: retrieving
-    class: src.components.retriever.ChunkRetriever
+    class: src.components.retriever.PostgresRetriever
     method: retrieve
     params:
-      retriever_search_type: "similarity"
-      retriever_search_kwargs: {"k":20}
+      tablename: "faiss_index_google_genai_risk_mgmt"
+      embedding_model_name: "all-MiniLM-L6-v2"
     input:
-      vectorstore: vectorstore
-    output: retriever
+      query:
+      k_retrieval: 20
+    output: retrieved_docs
 
   - name: reranking
     class: src.components.reranker.Reranker
@@ -31,8 +23,8 @@ pipeline:
       prompt_name: "system-reranker-prompt"
       prompt_version: "latest"
     input:
-      retriever: retriever
       query:
+      retrieved_docs: retrieved_docs
     output: reranked_document
 
   - name: autorating

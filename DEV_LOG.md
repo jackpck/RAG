@@ -56,3 +56,6 @@ do `response = await llm.ainvoke(query)` and `response = response.content` inste
 
 Run `markitdown path/to/pdf > markdown_name.md` to convert pdf to markdown. Preferred
 if pdf has many tables and changing layout over pages.
+
+Run below if sh run_docker_image.sh gives line break error
+tr -d '\r' < run_docker_image.sh > fixed.sh && mv fixed.sh run_docker_image.sh

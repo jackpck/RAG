@@ -39,9 +39,8 @@ class Reranker:
         self.reranker_prompt = prompt.format_messages()[0].content
 
     @sync
-    async def rerank(self, retriever: VectorStoreRetriever,
+    async def rerank(self, retrieved_docs: List[Document],
                      query: str) -> List[Document]:
-        retrieved_docs = retriever.invoke(query)
 
         async def score_doc(doc: Document) -> tuple[int, Document]:
             try:

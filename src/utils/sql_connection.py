@@ -1,4 +1,4 @@
-import psycopg2
+import psycopg
 from langchain_community.vectorstores import FAISS
 import numpy as np
 
@@ -7,19 +7,22 @@ class NeonPostgres:
                  user: str,
                  password: str,
                  host: str,
-                 port: str):
+                 port: str,
+                 sslmode: str):
         self._setup_connection(dbname=dbname,
                                 user=user,
                                 password=password,
                                 host=host,
-                                port=port)
+                                port=port,
+                                sslmode=sslmode)
 
-    def _setup_connection(self, dbname, user, password, host, port):
-        self.conn = psycopg2.connect(dbname=dbname,
+    def _setup_connection(self, dbname, user, password, host, port, sslmode):
+        self.conn = psycopg.connect(dbname=dbname,
                                     user=user,
                                     password=password,
                                     host=host,
-                                    port=port)
+                                    port=port,
+                                    sslmode=sslmode)
         self.cur = self.conn.cursor()
         return self.conn
 
@@ -29,7 +32,8 @@ class NeonPostgres:
             id SERIAL PRIMARY KEY,
             document_id TEXT,
             content TEXT,
-            embedding vector(384),
+            metadata TEXT,
+            embedding vector(384)
         );
         """
         self.cur.execute("CREATE EXTENSION IF NOT EXISTS vector;")
@@ -48,20 +52,32 @@ class NeonPostgres:
         self.cur.execute(create_table_query)
 
     def get_embedding_from_vectorstore(self, vectorstore: FAISS):
-        faiss_index = vectorstore.index
-        metadatas = vectorstore.docstore._dict
-        embeddings = np.stack([faiss_index.reconstruct(i) for i in range(faiss_index.ntotal)])
-        doc_ids = list(metadatas.keys())
+        doc_ids = []
+        embeddings = []
+        doc_metadata = []
+        doc_content = []
 
-        return doc_ids, embeddings
+        faiss_index = vectorstore.index
+        ntotal = faiss_index.ntotal
+        vectors = faiss_index.reconstruct_n(0, ntotal)
+        for i, (_, doc_id) in enumerate(vectorstore.index_to_docstore_id.items()):
+            doc = vectorstore.docstore.search(doc_id)
+            doc_ids.append(doc.id)
+            embeddings.append(vectors[i])
+            doc_metadata.append(doc.metadata)
+            doc_content.append(doc.page_content)
+
+        return doc_ids, embeddings, doc_metadata, doc_content
 
     def insert_embedding_to_table(self, tablename: str,
-                                        embeddings: np.ndarray,
-                                        doc_ids: list):
-        for doc_id, emb in zip(doc_ids, embeddings):
+                                        embeddings: list[np.ndarray],
+                                        doc_ids: list,
+                                        doc_content: list[str],
+                                        doc_metadata: list[str]):
+        for doc_id, emb, content, metadata in zip(doc_ids, embeddings, doc_content, doc_metadata):
             self.cur.execute(
-                f"INSERT INTO {tablename} (document_id, embedding) VALUES (%s, %s)",
-                (doc_id, emb.to_list())
+                f"INSERT INTO {tablename} (document_id, embedding, content, metadata) VALUES (%s, %s, %s, %s)",
+                (doc_id, emb.tolist(), content, metadata["source"])
             )
 
     def insert_feedback_to_table(self, tablename: str,

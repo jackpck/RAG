@@ -1,1 +1,1 @@
-What are the Socio-technical Considerations?
+What are the top risks enterprise should consider and mitigate when adopting GenAI?

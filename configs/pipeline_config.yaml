@@ -28,17 +28,19 @@ pipeline:
     input:
       split_docs: split_docs
       persist_vs: "serverless"
+      tablename: "faiss_index_google_genai_risk_mgmt"
     output: vectorstore
 
   - name: retrieving
-    class: src.components.retriever.ChunkRetriever
+    class: src.components.retriever.PostgresRetriever
     method: retrieve
     params:
-      retriever_search_type: "similarity"
-      retriever_search_kwargs: {"k":20}
+      tablename: "faiss_index_google_genai_risk_mgmt"
+      embedding_model_name: "all-MiniLM-L6-v2"
     input:
-      vectorstore: vectorstore
-    output: retriever
+      query:
+      k_retrieval: 20
+    output: retrieved_docs
 
   - name: reranking
     class: src.components.reranker.Reranker
@@ -53,8 +55,8 @@ pipeline:
       prompt_name: "system-reranker-prompt"
       prompt_version: "latest"
     input:
-      retriever: retriever
       query:
+      retrieved_docs: retrieved_docs
     output: reranked_document
 
   - name: autorating
@@ -69,8 +71,8 @@ pipeline:
       prompt_name: "system-autorater-prompt"
       prompt_version: "latest"
     input:
-      reranked_document: reranked_document
       query:
+      reranked_document: reranked_document
     output: context
 
   - name: generating
