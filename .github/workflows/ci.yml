@@ -35,6 +35,12 @@ jobs:
           LANGSMITH_PROJECT: ${{ vars.LANGSMITH_PROJECT }}
           LANGSMITH_TRACING: ${{ vars.LANGSMITH_TRACING }}
           LANGCHAIN_CALLBACKS_BACKGROUND: ${{ vars.LANGCHAIN_CALLBACKS_BACKGROUND }}
+          DB_NAME: ${{ var.DB_NAME }}
+          DB_PORT: ${{ var.DB_PORT }}
+          DB_USER: ${{ var.DB_USER }}
+          DB_PWD: ${{ secrets.DB_PWD }}
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_ENDPOINT: ${{ secrets.DB_ENDPOINT }}
 
   # Build and push Docker image (only if tests pass)
   docker:
