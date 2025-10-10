@@ -46,7 +46,7 @@ class PostgresRetriever:
         query_embedding = self.embedding_model.embed_query(query)
         self.neon_db.cur.execute(retrieval_query, (query_embedding,))
         retrieved_docs = self.neon_db.cur.fetchall()
-        return [Document(page_content=doc[1], metadata={"source":doc[2]}) for doc in retrieved_docs]
+        return [Document(page_content=doc[1], metadata={"source":int(doc[2])}) for doc in retrieved_docs]
 
 
 if __name__ == "__main__":

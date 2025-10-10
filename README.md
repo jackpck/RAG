@@ -128,7 +128,7 @@ and evaluation.
 
 ## MVP3
 
-- user feedback to neon
+- ~~user feedback to neon~~
 - Agentic RAG (modulized)
 - Graph RAG
 
